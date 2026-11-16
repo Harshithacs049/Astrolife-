@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Space Radiation Monitoring</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Radiation Exposure Trend Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .rad-grid-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: linear-gradient(150deg, rgba(16, 26, 50, 0.8), rgba(9, 15, 32, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .metric-card small {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        /* Risk Status Badges */
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .risk-low { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+        .risk-moderate { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
+        .risk-high { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+
+        .rad-main-split {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Progress Bar for NASA Career Limit (600 mSv) */
+        .limit-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #080d1e;
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 12px 0 8px;
+            border: 1px solid var(--border);
+        }
+        .limit-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            width: 0%;
+            transition: width 0.5s ease, background 0.3s ease;
+        }
+        /* Biological Effects List */
+        .bio-risk-item {
+            padding: 14px;
+            background: rgba(8, 13, 30, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .bio-risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .bio-risk-header strong { font-size: 14px; color: #fff; }
+        .bio-risk-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+        /* Recommendations & History Table */
+        .rad-bottom-split {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+        }
+        .rec-list { list-style: none; }
+        .rec-list li {
+            padding: 12px 14px;
+            border-left: 3px solid var(--cyan);
+            background: rgba(56, 189, 248, 0.06);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .history-table th { color: var(--cyan); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .history-table td { color: var(--muted); }
+
+        @media (max-width: 960px) {
+            .rad-grid-top { grid-template-columns: repeat(2, 1fr); }
+            .rad-main-split, .rad-bottom-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 540px) {
+            .rad-grid-top { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- NAVIGATION -->
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">✦</span> ASTROLIFE
+        </a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Mission Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <!-- HEADER BANNER -->
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> CANS / DOSIMETER TELEMETRY</span>
+            <h1>Space Radiation <span>Monitoring & Risk Analysis</span></h1>
+            <p>
+                Continuous tracking of Galactic Cosmic Rays (GCR) and Solar Particle Events (SPE) to evaluate 
+                biological impact and guide shielding countermeasures.
+            </p>
+        </section>
+
+        <!-- 1. TOP TELEMETRY & CUMULATIVE METRICS -->
+        <div class="rad-grid-top">
+            <div class="metric-card">
+                <small>Current Dose Rate</small>
+                <div class="metric-value" id="currentDoseRate">0.64 mSv/d</div>
+                <div class="metric-sub">Nominal LEO / Transit baseline</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Cumulative Mission Dose</small>
+                <div class="metric-value" id="cumulativeDose">0.0 mSv</div>
+                <div class="limit-bar-bg"><div class="limit-bar-fill" id="limitBarFill"></div></div>
+                <div class="metric-sub"><span id="limitPercent">0%</span> of 600 mSv NASA career limit</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Solar Activity Status</small>
+                <div class="metric-value" id="solarStatus" style="font-size: 22px;">QUIET (G0)</div>
+                <div class="metric-sub">No active Solar Particle Events</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Overall Risk Level</small>
+                <div style="margin-top: 6px;" id="overallRiskBadge">
+                    <span class="risk-badge risk-low">NOMINAL / LOW</span>
+                </div>
+                <div class="metric-sub" id="riskSummaryText">Within standard mission threshold</div>
+            </div>
+        </div>
+
+        <!-- 2. TREND CHART & BIOLOGICAL EFFECT INDICATORS -->
+        <div class="rad-main-split">
+            <!-- Radiation Exposure Trend Chart -->
+            <div class="panel-box">
+                <h3>
+                    <span>Radiation Exposure Trend (mSv)</span>
+                    <button type="button" id="simulateFlareBtn" class="btn-fill-demo">+ Simulate Solar Flare</button>
+                </h3>
+                <canvas id="radiationChart" height="150"></canvas>
+            </div>
+
+            <!-- Potential Effects / Biological Risk Indicators -->
+            <div class="panel-box">
+                <h3>Biological Risk Indicators</h3>
+
+                <div class="bio-risk-item">
+                    <div class="bio-risk-header">
+                        <strong>DNA Double-Strand Break Risk</strong>
+                        <span class="risk-badge risk-low" id="dnaRiskBadge">LOW</span>
+                    </div>
+                    <p id="dnaRiskDesc">High-energy HZE ions can cause complex DNA lesions. Cellular repair mechanisms currently operating within baseline.</p>
+                </div>
+
+                <div class="bio-risk-item">
+                    <div class="bio-risk-header">
+                        <strong>Long-Term Cancer Risk (REID)</strong>
+                        <span class="risk-badge risk-low" id="cancerRiskBadge">&lt; 1.0%</span>
+                    </div>
+                    <p id="cancerRiskDesc">Risk of Exposure-Induced Death (REID) scales with cumulative mSv absorbed across mission duration.</p>
+                </div>
+
+                <div class="bio-risk-item" style="margin-bottom: 0;">
+                    <div class="bio-risk-header">
+                        <strong>Cellular & Immune Suppression</strong>
+                        <span class="risk-badge risk-low" id="immuneRiskBadge">STABLE</span>
+                    </div>
+                    <p id="immuneRiskDesc">Lymphocyte count and oxidative stress markers remain stable under current shielding.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. PREVENTIVE SAFETY RECOMMENDATIONS & CUMULATIVE HISTORY -->
+        <div class="rad-bottom-split">
+            <!-- Preventive Safety Recommendations -->
+            <div class="panel-box">
+                <h3>Preventive Safety Recommendations</h3>
+                <ul class="rec-list" id="recommendationsList">
+                    <!-- Populated dynamically by radiation.js -->
+                </ul>
+
+                <!-- Manual Dosimeter Log Form -->
+                <form id="logRadiationForm" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+                    <label class="form-label">Log Daily Dosimeter Reading (mSv)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" step="0.01" min="0.01" max="500" id="doseInput" class="form-input" style="padding-left: 14px;" placeholder="e.g., 0.72" required>
+                        <select id="sourceInput" class="form-input" style="padding-left: 10px;">
+                            <option value="GCR Baseline">GCR Baseline</option>
+                            <option value="EVA Spacewalk">EVA Spacewalk</option>
+                            <option value="Solar Particle Event">Solar Event (SPE)</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="width: auto; padding: 0 20px;">Log</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Cumulative Exposure History -->
+            <div class="panel-box">
+                <h3>
+                    <span>Cumulative Exposure History</span>
+                    <button type="button" id="resetHistoryBtn" class="btn-fill-demo">Reset Demo Data</button>
+                </h3>
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Mission Day</th>
+                                <th>Source</th>
+                                <th>Daily Dose</th>
+                                <th>Cumulative</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/radiation.js"></script>
+</body>
+</html>

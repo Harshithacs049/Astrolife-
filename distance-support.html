@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Autonomous Medical & Offline Support</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .support-grid-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: linear-gradient(150deg, rgba(16, 26, 50, 0.8), rgba(9, 15, 32, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .metric-card small {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .status-online { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+        .status-offline { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+
+        .support-main-split {
+            display: grid;
+            grid-template-columns: 1.2fr 1.2fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Emergency Guidelines Accordion / Cards */
+        .guideline-item {
+            background: rgba(8, 13, 30, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .guideline-item strong { color: var(--cyan); font-size: 14px; display: block; margin-bottom: 4px; }
+        .guideline-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+        /* Sync Queue Table */
+        .sync-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .sync-table th, .sync-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .sync-table th { color: var(--cyan); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .sync-table td { color: var(--muted); }
+
+        @media (max-width: 960px) {
+            .support-grid-top { grid-template-columns: repeat(2, 1fr); }
+            .support-main-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 540px) {
+            .support-grid-top { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- NAVIGATION -->
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">✦</span> ASTROLIFE
+        </a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Mission Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <!-- HEADER BANNER -->
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> AUTONOMOUS DECISION SUPPORT</span>
+            <h1>Distance from Earth <span>& Offline Medical Guidance</span></h1>
+            <p>
+                Mitigating communication latencies (up to 24+ light-minutes) and blackout intervals with 
+                locally stored medical protocols, autonomous health triage, and queued telemetry synchronization.
+            </p>
+        </section>
+
+        <!-- 1. TOP METRICS -->
+        <div class="support-grid-top">
+            <div class="metric-card">
+                <small>Communication Status</small>
+                <div style="margin-top: 6px;" id="commStatusBadge">
+                    <span class="status-pill status-online">ONLINE (Delay: 12s)</span>
+                </div>
+                <div class="metric-sub" id="commSubText">Direct Deep-Space Link Active</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Queued Sync Reports</small>
+                <div class="metric-value" id="queueCountVal">0</div>
+                <div class="metric-sub">Packets awaiting downlink</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Local Knowledge Base</small>
+                <div class="metric-value" style="color: #4ade80;">100%</div>
+                <div class="metric-sub">Protocols cached offline</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Autonomous Triage Engine</small>
+                <div class="metric-value" style="font-size: 20px; color: var(--cyan);">ACTIVE</div>
+                <div class="metric-sub">Local decision algorithms ready</div>
+            </div>
+        </div>
+
+        <!-- 2. MAIN SPLIT: AUTONOMOUS TRIAGE & OFFLINE GUIDANCE -->
+        <div class="support-main-split">
+            <!-- Autonomous Health Assessment & Triage Tool -->
+            <div class="panel-box">
+                <h3>
+                    <span>Autonomous Health Triage</span>
+                    <button type="button" id="toggleOfflineBtn" class="btn-fill-demo">Toggle Deep Space Mode</button>
+                </h3>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                    Run a local diagnostic evaluation without waiting for ground control response.
+                </p>
+
+                <form id="triageForm">
+                    <div class="form-group">
+                        <label class="form-label">Primary Symptom or Area</label>
+                        <select id="triageSymptom" class="form-input" style="padding-left: 14px;">
+                            <option value="Cardiovascular / Heart Rate Anomaly">Cardiovascular / Heart Rate Anomaly</option>
+                            <option value="Trauma / Minor Laceration / Burn">Trauma / Minor Laceration / Burn</option>
+                            <option value="Ocular / Vision Alteration (SANS)">Ocular / Vision Alteration (SANS)</option>
+                            <option value="Severe Headache / Vestibular Disorientation">Severe Headache / Vestibular Disorientation</option>
+                            <option value="Gastrointestinal / Sleep Disturbance">Gastrointestinal / Sleep Disturbance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Severity Level (1 = Mild, 10 = Emergency)</label>
+                        <input type="number" min="1" max="10" id="triageSeverity" class="form-input" style="padding-left: 14px;" value="3" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Clinical Observations & Vitals Note</label>
+                        <textarea id="triageNotes" class="form-input" style="padding: 12px 14px; height: 80px;" placeholder="e.g., BP 120/80, slight dizziness after exercise..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Run Autonomous Diagnosis →</button>
+                </form>
+
+                <!-- Triage Result Box -->
+                <div id="triageResultBox" style="margin-top: 20px; padding: 16px; background: rgba(56, 189, 248, 0.06); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: 10px; display: none;">
+                    <strong style="color: var(--cyan); display: block; margin-bottom: 6px;">✦ Local Protocol Recommendation:</strong>
+                    <p id="triageResultText" style="font-size: 13px; color: var(--text-primary); line-height: 1.6;"></p>
+                </div>
+            </div>
+
+            <!-- Locally Stored Medical Guidance & Emergency Instructions -->
+            <div class="panel-box">
+                <h3>Offline Emergency Instructions</h3>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                    Pre-loaded emergency protocols stored locally for immediate reference during communication blackouts.
+                </p>
+
+                <div class="guideline-item">
+                    <strong>1. Acute Radiation Sickness (SPE / Flare Protocol)</strong>
+                    <p>Immediate shelter in high-density core module. Administer prescribed antiemetics, monitor hydration, and log blood counts.</p>
+                </div>
+
+                <div class="guideline-item">
+                    <strong>2. Zero-G Circulatory / Vestibular Sync</strong>
+                    <p>Rehydrate with 500ml electrolyte solution. Perform recumbent posture adjustments and check intracranial pressure indicators.</p>
+                </div>
+
+                <div class="guideline-item" style="margin-bottom: 0;">
+                    <strong>3. Emergency Communication Delay Protocol</strong>
+                    <p>Ground control acknowledgment lag: 12 to 28 minutes. All critical triage packets are automatically queued for next orbital pass.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. BOTTOM SPLIT: SYNC QUEUE & OFFLINE RECORDS -->
+        <div class="support-main-split" style="margin-bottom: 0;">
+            <!-- Delayed Emergency Reporting & Sync Manager -->
+            <div class="panel-box">
+                <h3>
+                    <span>Telemetry Sync Manager</span>
+                    <button type="button" id="syncNowBtn" class="btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px;">Sync with Ground ⟳</button>
+                </h3>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                    When offline, reports are securely queued locally. Click sync when communication is established.
+                </p>
+                <div style="overflow-x: auto;">
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Report Type</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="syncTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Local Health Records Repository -->
+            <div class="panel-box">
+                <h3>
+                    <span>Local Health Records Cache</span>
+                    <button type="button" id="clearRecordsBtn" class="btn-fill-demo">Clear Cache</button>
+                </h3>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                    Encrypted local cache of astronaut biometric logs and diagnostic history.
+                </p>
+                <div style="overflow-x: auto;">
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Record ID</th>
+                                <th>Category</th>
+                                <th>Summary</th>
+                                <th>Storage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/distance-support.js"></script>
+</body>
+</html>

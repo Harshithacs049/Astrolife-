@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Emergency Alert & Response Center</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .emergency-grid-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: linear-gradient(150deg, rgba(16, 26, 50, 0.8), rgba(9, 15, 32, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .metric-card small {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .pill-critical { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+        .pill-warning { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
+        .pill-nominal { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+
+        .emergency-split {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .active-alert-box {
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.35);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+        .offline-guide-item {
+            background: rgba(8, 13, 30, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .offline-guide-item strong { color: var(--cyan); font-size: 13.5px; display: block; margin-bottom: 4px; }
+        .offline-guide-item p { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 0; }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .history-table th { color: var(--cyan); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .history-table td { color: var(--muted); }
+
+        @media (max-width: 960px) {
+            .emergency-grid-top { grid-template-columns: repeat(2, 1fr); }
+            .emergency-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 540px) {
+            .emergency-grid-top { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo"><span class="logo-icon">✦</span> ASTROLIFE</a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Mission Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> AUTONOMOUS CRISIS RESPONSE</span>
+            <h1>Emergency Alert <span>& Response Center</span></h1>
+            <p>
+                Real-time monitoring of critical telemetry thresholds, cardiovascular anomalies, oxygen depletion, 
+                and environmental hazards. Manages secure mission control downlinks and offline emergency queueing.
+            </p>
+        </section>
+
+        <!-- TOP METRICS -->
+        <div class="emergency-grid-top">
+            <div class="metric-card">
+                <small>System Alert Status</small>
+                <div id="systemAlertBadge" style="margin-top: 6px;"><span class="status-pill pill-nominal">ALL SYSTEMS NOMINAL</span></div>
+                <div class="metric-sub" id="activeCountSub">0 active critical alerts</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Mission Control Link</small>
+                <div id="mcLinkBadge" style="margin-top: 6px;"><span class="status-pill pill-nominal">ONLINE (CONNECTED)</span></div>
+                <div class="metric-sub" id="queueStatusSub">0 messages in transmission queue</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Simulate Emergency</small>
+                <button type="button" id="simulateEmergencyBtn" class="btn-fill-demo" style="margin-top: 6px; width: 100%; text-align: center; padding: 8px;">Trigger Test Alarm</button>
+                <div class="metric-sub">Tests auto-detection rules</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Connectivity Toggle</small>
+                <button type="button" id="toggleOfflineBtn" class="btn-fill-demo" style="margin-top: 6px; width: 100%; text-align: center; padding: 8px; background: rgba(56,189,248,0.15); color: var(--cyan);">Toggle Offline Mode</button>
+                <div class="metric-sub">Simulates deep space blackout</div>
+            </div>
+        </div>
+
+        <!-- ACTIVE ALERTS & OFFLINE GUIDANCE SPLIT -->
+        <div class="emergency-split">
+            <!-- Active Alerts Panel -->
+            <div class="panel-box">
+                <h3>
+                    <span>Active Emergency Screen</span>
+                    <button type="button" id="clearAlertsBtn" class="btn-fill-demo">Acknowledge All</button>
+                </h3>
+                <div id="activeAlertsContainer">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Offline Emergency Protocols -->
+            <div class="panel-box">
+                <h3>Offline Emergency Protocols</h3>
+                <div class="offline-guide-item">
+                    <strong>1. Complete Communication Blackout</strong>
+                    <p>If Earth transmission fails, automated telemetry is securely queued locally. Do not attempt unverified bypasses.</p>
+                </div>
+                <div class="offline-guide-item">
+                    <strong>2. Severe Hypoxia / O₂ Drop (< 19.5%)</strong>
+                    <p>Don emergency portable oxygen mask immediately. Seal habitat core hatch and inspect CDRA scrubber status.</p>
+                </div>
+                <div class="offline-guide-item" style="margin-bottom: 0;">
+                    <strong>3. Solar Flare / Radiation Spike (> 25 mSv/h)</strong>
+                    <p>Evacuate all crew to the water-shielded storm shelter. Restrict metabolic activity and initiate potassium iodide protocol if required.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERT HISTORY TABLE -->
+        <div class="panel-box">
+            <h3>Emergency Alert & Transmission History</h3>
+            <div style="overflow-x: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Time Detected</th>
+                            <th>Category</th>
+                            <th>Severity</th>
+                            <th>Detected Issue</th>
+                            <th>Mission Control Status</th>
+                            <th>Acknowledgment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertHistoryTableBody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/emergency.js"></script>
+</body>
+</html>

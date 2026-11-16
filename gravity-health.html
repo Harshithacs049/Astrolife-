@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Gravity & Microgravity Health Monitoring</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Physical Fitness & Musculoskeletal Progress Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .grav-grid-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: linear-gradient(150deg, rgba(16, 26, 50, 0.8), rgba(9, 15, 32, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .metric-card small {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .status-optimal { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+        .status-watch { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
+        .status-alert { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+
+        .grav-main-split {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Physiological Risk Cards */
+        .physio-item {
+            padding: 14px;
+            background: rgba(8, 13, 30, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .physio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .physio-header strong { font-size: 14px; color: #fff; }
+        .physio-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+        /* Bottom Split: Logger & History */
+        .grav-bottom-split {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .history-table th { color: var(--cyan); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .history-table td { color: var(--muted); }
+
+        @media (max-width: 960px) {
+            .grav-grid-top { grid-template-columns: repeat(2, 1fr); }
+            .grav-main-split, .grav-bottom-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 540px) {
+            .grav-grid-top { grid-template-columns: 1fr; }
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- NAVIGATION -->
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">✦</span> ASTROLIFE
+        </a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Mission Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <!-- HEADER BANNER -->
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> MICROGRAVITY COUNTERMEASURES</span>
+            <h1>Gravity & Microgravity <span>Physiological Monitor</span></h1>
+            <p>
+                Tracking musculoskeletal loading, cardiovascular adaptation, neuro-ocular health (SANS), 
+                and sensorimotor balance to counteract prolonged weightlessness.
+            </p>
+        </section>
+
+        <!-- 1. TOP TELEMETRY METRICS -->
+        <div class="grav-grid-top">
+            <div class="metric-card">
+                <small>Bone Mineral Density (BMD)</small>
+                <div class="metric-value" id="bmdRetentionVal">99.2%</div>
+                <div class="metric-sub" id="bmdSubText">-0.8% vs pre-flight baseline</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Muscle Strength Index</small>
+                <div class="metric-value" id="muscleIndexVal">96 / 100</div>
+                <div class="metric-sub">ARED resistive load nominal</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Cardiovascular Status</small>
+                <div class="metric-value" id="cardioVal">64 bpm</div>
+                <div class="metric-sub" id="bpSubText">BP: 116/74 mmHg (Resting)</div>
+            </div>
+
+            <div class="metric-card">
+                <small>SANS / Ocular Risk</small>
+                <div style="margin-top: 6px;" id="sansStatusBadge">
+                    <span class="status-pill status-optimal">NOMINAL / CLEAR</span>
+                </div>
+                <div class="metric-sub" id="sansSubText">No optic disc edema detected</div>
+            </div>
+        </div>
+
+        <!-- 2. PHYSICAL FITNESS CHART & POTENTIAL EFFECTS MONITOR -->
+        <div class="grav-main-split">
+            <!-- Physical Fitness Progress Chart -->
+            <div class="panel-box">
+                <h3>
+                    <span>Physical Fitness & Musculoskeletal Progress</span>
+                    <button type="button" id="simulateDecondBtn" class="btn-fill-demo">+ Simulate Missed Workouts</button>
+                </h3>
+                <canvas id="gravityChart" height="155"></canvas>
+            </div>
+
+            <!-- Physiological Effects & Risk Indicators -->
+            <div class="panel-box">
+                <h3>Microgravity Adaptation Indicators</h3>
+
+                <div class="physio-item">
+                    <div class="physio-header">
+                        <strong>Bone Density & Calcium Balance</strong>
+                        <span class="status-pill status-optimal" id="bonePill">PROTECTED</span>
+                    </div>
+                    <p id="boneDesc">Weightless unloading accelerates bone resorption (~1–1.5%/month without countermeasures). Daily resistive squats & deadlifts active.</p>
+                </div>
+
+                <div class="physio-item">
+                    <div class="physio-header">
+                        <strong>SANS (Neuro-Ocular Syndrome)</strong>
+                        <span class="status-pill status-optimal" id="ocularPill">STABLE</span>
+                    </div>
+                    <p id="ocularDesc">Cephalad fluid shift monitored via Amsler grid & visual acuity checks. Intracranial pressure markers normal.</p>
+                </div>
+
+                <div class="physio-item" style="margin-bottom: 0;">
+                    <div class="physio-header">
+                        <strong>Balance & Sensorimotor Coordination</strong>
+                        <span class="status-pill status-optimal" id="balancePill">CALIBRATED</span>
+                    </div>
+                    <p id="balanceDesc">Vestibular-ocular reflex and proprioceptive readiness maintained for planetary surface landing transitions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. DAILY EXERCISE & BIOMETRIC LOGGER + HISTORY -->
+        <div class="grav-bottom-split">
+            <!-- Exercise, Cardio & SANS Check-in Form -->
+            <div class="panel-box">
+                <h3>Log Countermeasure & Assessment</h3>
+                <form id="gravityLogForm">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Exercise Duration (mins)</label>
+                            <input type="number" min="0" max="240" id="exerciseMins" class="form-input" style="padding-left: 14px;" value="90" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Muscle Strength Score (1-100)</label>
+                            <input type="number" min="40" max="100" id="strengthScore" class="form-input" style="padding-left: 14px;" value="96" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Resting Heart Rate (bpm)</label>
+                            <input type="number" min="40" max="160" id="restingHr" class="form-input" style="padding-left: 14px;" value="64" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Blood Pressure (mmHg)</label>
+                            <input type="text" id="bloodPressure" class="form-input" style="padding-left: 14px;" value="116/74" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Eye Health Assessment (SANS / Amsler Grid)</label>
+                        <select id="eyeAssessment" class="form-input" style="padding-left: 14px;">
+                            <option value="Normal Vision / Clear Grid">Normal Vision / Clear Amsler Grid</option>
+                            <option value="Mild Near-Vision Shift">Mild Hyperopic (Near-Vision) Shift</option>
+                            <option value="Wavy Grid / Visual Distortion">Wavy Grid Lines / Optic Pressure Alert</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Balance & Coordination Drill</label>
+                        <select id="balanceDrill" class="form-input" style="padding-left: 14px;">
+                            <option value="Passed - Steady">Passed - Steady Coordination</option>
+                            <option value="Mild Vestibular Lag">Mild Vestibular Lag</option>
+                            <option value="Disorientation / Vertigo">Postural Instability / Vertigo</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Record Mission Session →</button>
+                </form>
+            </div>
+
+            <!-- Countermeasure & Health Progress History -->
+            <div class="panel-box">
+                <h3>
+                    <span>Physiological & Exercise History</span>
+                    <button type="button" id="resetGravityBtn" class="btn-fill-demo">Reset Demo Logs</button>
+                </h3>
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Sol</th>
+                                <th>Exercise</th>
+                                <th>Strength</th>
+                                <th>Cardio</th>
+                                <th>Eye / SANS</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gravityTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/gravity-health.js"></script>
+</body>
+</html>

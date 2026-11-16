@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Closed & Hostile Environment Monitoring</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .env-grid-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: linear-gradient(150deg, rgba(16, 26, 50, 0.8), rgba(9, 15, 32, 0.95));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .metric-card small {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .metric-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .status-optimal { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+        .status-watch { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
+        .status-alert { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+
+        /* Environmental Warning Banner */
+        .env-alert-banner {
+            padding: 16px 22px;
+            border-radius: 12px;
+            margin-bottom: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+            font-size: 14px;
+        }
+        .env-alert-banner.is-warning {
+            background: rgba(248, 113, 113, 0.12);
+            border-color: rgba(248, 113, 113, 0.45);
+            color: #f87171;
+        }
+
+        .env-main-split {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Nutrition & Hydration Progress Bars */
+        .progress-row { margin-bottom: 16px; }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+        .progress-bg {
+            width: 100%;
+            height: 10px;
+            background: #080d1e;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            transition: width 0.4s ease;
+        }
+
+        .env-bottom-split {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .history-table th { color: var(--cyan); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+        .history-table td { color: var(--muted); }
+
+        @media (max-width: 960px) {
+            .env-grid-top { grid-template-columns: repeat(2, 1fr); }
+            .env-main-split, .env-bottom-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 540px) {
+            .env-grid-top, .form-row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- NAVIGATION -->
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">✦</span> ASTROLIFE
+        </a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Mission Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <!-- HEADER BANNER -->
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> ECLSS & HABITAT TELEMETRY</span>
+            <h1>Closed & Hostile Environments <span>Life Support Monitor</span></h1>
+            <p>
+                Real-time tracking of cabin atmosphere (O<sub>2</sub> / CO<sub>2</sub>), thermal-humidity balance, 
+                immune resilience, and closed-loop nutrition & hydration targets.
+            </p>
+        </section>
+
+        <!-- ENVIRONMENTAL WARNING ALERTS BANNER -->
+        <div id="envAlertBanner" class="env-alert-banner">
+            <div>
+                <strong id="alertTitle">✦ ECLSS ATMOSPHERE NOMINAL:</strong>
+                <span id="alertMessage">Oxygen partial pressure, CO₂ scrubbers, and thermal controls operating within safe limits.</span>
+            </div>
+            <button type="button" id="simulateCo2Btn" class="btn-fill-demo">Simulate CO₂ Scrubber Spike</button>
+        </div>
+
+        <!-- 1. TOP ENVIRONMENTAL METRICS -->
+        <div class="env-grid-top">
+            <div class="metric-card">
+                <small>Cabin Oxygen (O<sub>2</sub>)</small>
+                <div class="metric-value" id="o2Val">20.9%</div>
+                <div class="metric-sub" id="o2Sub">ppO₂: 21.2 kPa (Nominal)</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Carbon Dioxide (CO<sub>2</sub>)</small>
+                <div class="metric-value" id="co2Val" style="color: #4ade80;">0.38%</div>
+                <div class="metric-sub" id="co2Sub">2.9 mmHg (Scrubber Active)</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Temp & Humidity</small>
+                <div class="metric-value" id="tempHumVal">22.4°C / 44%</div>
+                <div class="metric-sub">Condensate recovery nominal</div>
+            </div>
+
+            <div class="metric-card">
+                <small>Immune & Microbial Status</small>
+                <div style="margin-top: 6px;" id="immuneStatusBadge">
+                    <span class="status-pill status-optimal">RESILIENT</span>
+                </div>
+                <div class="metric-sub" id="immuneSub">HEPA & surface swabs clear</div>
+            </div>
+        </div>
+
+        <!-- 2. ATMOSPHERIC CHART & NUTRITION / HYDRATION TRACKER -->
+        <div class="env-main-split">
+            <!-- Atmospheric Trend Chart -->
+            <div class="panel-box">
+                <h3>
+                    <span>Cabin Atmosphere Trends (O<sub>2</sub> % & CO<sub>2</sub> mmHg)</span>
+                    <button type="button" id="resetEnvBtn" class="btn-fill-demo">Reset Sensors</button>
+                </h3>
+                <canvas id="envChart" height="155"></canvas>
+            </div>
+
+            <!-- Nutrition & Hydration Tracking -->
+            <div class="panel-box">
+                <h3>Daily Nutrition & Hydration Targets</h3>
+
+                <div class="progress-row">
+                    <div class="progress-label">
+                        <span>Hydration Intake</span>
+                        <strong style="color: var(--cyan);" id="waterProgressText">2.1 / 2.5 L</strong>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" id="waterBar" style="width: 84%;"></div></div>
+                </div>
+
+                <div class="progress-row">
+                    <div class="progress-label">
+                        <span>Caloric Intake</span>
+                        <strong style="color: var(--cyan);" id="calProgressText">2,450 / 2,800 kcal</strong>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" id="calBar" style="width: 87%;"></div></div>
+                </div>
+
+                <div class="progress-row">
+                    <div class="progress-label">
+                        <span>Vitamin D & Micronutrients</span>
+                        <strong style="color: #4ade80;" id="vitProgressText">100% (Supplemented)</strong>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" id="vitBar" style="width: 100%;"></div></div>
+                </div>
+
+                <!-- Quick Log Hydration & Nutrition -->
+                <form id="nutritionForm" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+                    <div class="form-row-2">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Add Water (Liters)</label>
+                            <input type="number" step="0.1" min="0.1" max="2" id="addWaterInput" class="form-input" style="padding-left: 14px;" value="0.3" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Add Meal (kcal)</label>
+                            <input type="number" step="50" min="50" max="1500" id="addCalInput" class="form-input" style="padding-left: 14px;" value="400" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Log Nutrition & Hydration →</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. CABIN SENSOR LOGGER & IMMUNE HEALTH RECORDS -->
+        <div class="env-bottom-split">
+            <!-- Sensor & Immune Check-in Logger -->
+            <div class="panel-box">
+                <h3>Log Habitat & Immune Check</h3>
+                <form id="envLogForm">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Oxygen Level (O<sub>2</sub> %)</label>
+                            <input type="number" step="0.1" min="15" max="25" id="inputO2" class="form-input" style="padding-left: 14px;" value="20.9" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CO<sub>2</sub> Partial Pressure (mmHg)</label>
+                            <input type="number" step="0.1" min="0.5" max="15" id="inputCo2" class="form-input" style="padding-left: 14px;" value="2.9" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Cabin Temp (°C)</label>
+                            <input type="number" step="0.1" min="15" max="35" id="inputTemp" class="form-input" style="padding-left: 14px;" value="22.4" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Relative Humidity (%)</label>
+                            <input type="number" min="20" max="85" id="inputHumidity" class="form-input" style="padding-left: 14px;" value="44" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Immune & Microbial Screening</label>
+                        <select id="inputImmune" class="form-input" style="padding-left: 14px;">
+                            <option value="Normal - No Symptoms">Normal - No Symptoms / Swab Clear</option>
+                            <option value="Mild Sinus / Allergen Sensitivity">Mild Sinus / Cabin Dust Sensitivity</option>
+                            <option value="Latent Viral Reactivation / Rash">Immune Dip / Skin Rash / Viral Marker</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Update Habitat Telemetry →</button>
+                </form>
+            </div>
+
+            <!-- Immune Health & Environmental Records Table -->
+            <div class="panel-box">
+                <h3>Immune Health & Habitat Telemetry Log</h3>
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Sol / Time</th>
+                                <th>O<sub>2</sub> (%)</th>
+                                <th>CO<sub>2</sub> (mmHg)</th>
+                                <th>Temp / RH</th>
+                                <th>Immune / Microbial Record</th>
+                            </tr>
+                        </thead>
+                        <tbody id="envTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/hostile-environment.js"></script>
+</body>
+</html>

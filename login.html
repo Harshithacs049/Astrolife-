@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Astronaut Login</title>
+    <meta name="description" content="Astronaut authentication portal for the AstroLife health monitoring system.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            padding: 4px;
+            font-size: 16px;
+            line-height: 1;
+            color: inherit;
+        }
+        #loginPassword {
+            padding-right: 42px;
+        }
+        .form-error {
+            color: #ff4d6d;
+            font-size: 12px;
+            margin-top: 5px;
+            min-height: 16px;
+            font-weight: 500;
+        }
+        .input-invalid {
+            border-color: #ff4d6d !important;
+        }
+        .auth-alert {
+            display: none;
+            background: rgba(255, 77, 109, 0.12);
+            border: 1px solid #ff4d6d;
+            color: #ff8fa3;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .auth-alert.visible {
+            display: block;
+        }
+        .auth-alert.success {
+            background: rgba(46, 213, 115, 0.14);
+            border-color: #2ed573;
+            color: #7bed9f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MINIMAL TOP HEADER -->
+    <header class="auth-header">
+        <a href="index.html" class="logo" aria-label="AstroLife Home">
+            <span class="logo-icon">✦</span>
+            ASTROLIFE
+        </a>
+        <a href="index.html" class="back-home-link">
+            ← Back to Mission Site
+        </a>
+    </header>
+
+    <!-- MAIN AUTH CONTAINER -->
+    <main class="auth-main">
+        <div class="auth-card">
+
+            <div class="auth-title-section">
+                <span class="auth-badge">
+                    <span class="auth-badge-dot"></span>
+                    MISSION ACCESS PORTAL
+                </span>
+                <h1>Astronaut Login</h1>
+                <p>Authenticate to access continuous health & telemetry decision-support.</p>
+            </div>
+
+            <!-- DYNAMIC STATUS ALERT -->
+            <div id="authAlert" class="auth-alert" role="alert"></div>
+
+            <form id="loginForm" novalidate>
+
+                <!-- EMAIL FIELD -->
+                <div class="form-group">
+                    <label for="loginEmail" class="form-label">Mission Email (Must end with @gmail.com)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✉</span>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="astronaut@gmail.com" autocomplete="email" required>
+                    </div>
+                    <div id="loginEmailError" class="form-error"></div>
+                </div>
+
+                <!-- PASSWORD FIELD -->
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">Access Code / Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your access code" autocomplete="current-password" required>
+                        <button type="button" class="password-toggle-btn" data-target="loginPassword" aria-label="Toggle password visibility">
+                            👁
+                        </button>
+                    </div>
+                    <div id="loginPasswordError" class="form-error"></div>
+                </div>
+
+                <!-- REMEMBER ME & FORGOT PASSWORD -->
+                <div class="form-row-between">
+                    <label class="checkbox-label" for="rememberMe">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Remember mission session</span>
+                    </label>
+                    <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" id="loginSubmitBtn" class="btn-primary">
+                    Authorize & Log In <span>→</span>
+                </button>
+
+            </form>
+
+            <!-- OR DIVIDER -->
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+            <!-- GOOGLE SIGN-IN PLACEHOLDER -->
+            <button type="button" class="btn-google" id="googleBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Continue with Google
+            </button>
+            <span class="google-placeholder-tag">✦ Interface placeholder until Firebase Authentication is integrated</span>
+
+            <!-- QUICK TESTING DEMO -->
+            <div class="demo-box" style="flex-direction: column; align-items: stretch; gap: 10px; margin-top: 16px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.5px;">
+                    ✦ QUICK FILL RECENT ACCOUNT:
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="fillDemoBtn" class="btn-fill-demo" style="flex: 1; text-align: center;">Fill Last Registered Account</button>
+                </div>
+            </div>
+
+            <!-- SWITCH TO REGISTER -->
+            <div class="auth-footer-link">
+                Don't have a mission account?
+                <a href="register.html">Register here</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GOOGLE SIGN-IN PLACEHOLDER MODAL -->
+    <div id="googleModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icon">✦</div>
+            <h3 id="modalTitle" class="modal-title">Firebase Auth Placeholder</h3>
+            <p class="modal-text">
+                Google Single Sign-On (SSO) is currently wired as an interface mockup for Phase 2.
+                Real OAuth credentials will be connected when Firebase Authentication backend services are enabled in production.
+            </p>
+            <button type="button" id="closeGoogleModalBtn" class="modal-btn">Understood</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Password Visibility Toggle
+        document.querySelectorAll('.password-toggle-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                btn.textContent = isPassword ? '🙈' : '👁';
+            });
+        });
+
+        // Modal handling for Google button
+        const googleModal = document.getElementById('googleModal');
+        document.getElementById('googleBtn').addEventListener('click', () => {
+            googleModal.style.display = 'flex';
+        });
+        document.getElementById('closeGoogleModalBtn').addEventListener('click', () => {
+            googleModal.style.display = 'none';
+        });
+
+        // 2. Form Elements & LocalStorage Authentication
+        const loginForm = document.getElementById('loginForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginEmailError = document.getElementById('loginEmailError');
+        const loginPasswordError = document.getElementById('loginPasswordError');
+        const authAlert = document.getElementById('authAlert');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        const fillDemoBtn = document.getElementById('fillDemoBtn');
+
+        // Auto-fill button for quick testing
+        fillDemoBtn.addEventListener('click', () => {
+            const lastUser = JSON.parse(localStorage.getItem('astrolife_registered_user') || 'null');
+            if (lastUser) {
+                loginEmail.value = lastUser.email;
+                loginPassword.value = lastUser.password;
+                authAlert.className = "auth-alert success visible";
+                authAlert.textContent = "✓ Demo credentials filled from last registration!";
+            } else {
+                authAlert.className = "auth-alert visible";
+                authAlert.textContent = "No registered account found in localStorage. Please register first.";
+            }
+        });
+
+        function validateEmail(email) {
+            const trimmed = email.trim();
+            if (!trimmed) return "Mission email is required.";
+            const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+            if (!gmailRegex.test(trimmed)) {
+                return "Email is wrong: Address must end with @gmail.com.";
+            }
+            return "";
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            let isValid = true;
+
+            // Validate Email format
+            const emailErr = validateEmail(loginEmail.value);
+            loginEmailError.textContent = emailErr;
+            loginEmail.classList.toggle('input-invalid', Boolean(emailErr));
+            if (emailErr) isValid = false;
+
+            // Validate Password entry
+            if (!loginPassword.value) {
+                loginPasswordError.textContent = "Access code / password is required.";
+                loginPassword.classList.add('input-invalid');
+                isValid = false;
+            } else {
+                loginPasswordError.textContent = "";
+                loginPassword.classList.remove('input-invalid');
+            }
+
+            if (!isValid) return;
+
+            const enteredEmail = loginEmail.value.trim().toLowerCase();
+            const enteredPassword = loginPassword.value;
+
+            // Check against stored users in localStorage
+            const users = JSON.parse(localStorage.getItem('astrolife_users') || '[]');
+            const matchedUser = users.find((u) => u.email.toLowerCase() === enteredEmail);
+
+            if (!matchedUser) {
+                authAlert.className = "auth-alert visible";
+                authAlert.textContent = "Login failed: No account found with this @gmail.com address. Please register first.";
+                loginEmail.classList.add('input-invalid');
+                return;
+            }
+
+            if (matchedUser.password !== enteredPassword) {
+                authAlert.className = "auth-alert visible";
+                authAlert.textContent = "Login failed: Incorrect password entered.";
+                loginPassword.classList.add('input-invalid');
+                return;
+            }
+
+            // Success: Store current session & redirect to dashboard
+            localStorage.setItem('astrolife_current_user', JSON.stringify(matchedUser));
+
+            authAlert.className = "auth-alert success visible";
+            authAlert.textContent = "✓ Authorization granted! Redirecting to astronaut dashboard...";
+            loginSubmitBtn.disabled = true;
+            loginSubmitBtn.textContent = "Entering Dashboard...";
+
+            setTimeout(() => {
+                // Change "dashboard.html" to your actual dashboard filename if different
+                window.location.href = "dashboard.html";
+            }, 1000);
+        }, true);
+    </script>
+</body>
+</html>

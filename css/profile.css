@@ -1,0 +1,233 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #050d1b;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 7%;
+    background: #0b1930;
+    border-bottom: 1px solid #183a59;
+}
+
+.logo {
+    color: #35dfff;
+    text-decoration: none;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.nav-label {
+    color: #a9bfd3;
+    font-size: 14px;
+}
+
+.container {
+    width: 90%;
+    max-width: 950px;
+    margin: 40px auto;
+}
+
+.page-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.tag {
+    color: #32dfff;
+    letter-spacing: 3px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.page-heading h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.page-heading p {
+    color: #a9bfd3;
+    line-height: 1.6;
+}
+
+#profileForm,
+.summary-section {
+    background: #0d1c32;
+    border: 1px solid #1e4566;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.profile-photo-section {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #23405a;
+    margin-bottom: 25px;
+}
+
+.photo-preview {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #17344f;
+    border: 2px solid #31dfff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    overflow: hidden;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-photo-section p {
+    color: #a9bfd3;
+    font-size: 13px;
+    margin: 8px 0;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.form-section h2,
+.summary-section h2 {
+    color: #39ddff;
+    font-size: 19px;
+    margin-bottom: 22px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.field {
+    margin-bottom: 20px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 14px;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #294966;
+    border-radius: 7px;
+    background: #071426;
+    color: white;
+    outline: none;
+    font: inherit;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: #35dfff;
+    box-shadow: 0 0 7px #1c7895;
+}
+
+.field textarea {
+    resize: vertical;
+}
+
+.note {
+    font-size: 12px;
+    color: #a9bfd3;
+    line-height: 1.6;
+}
+
+.save-btn,
+.edit-btn {
+    padding: 14px 22px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 8px 8px 8px 0;
+}
+
+.save-btn {
+    background: linear-gradient(90deg, #19cfff, #579cff);
+    color: #061321;
+}
+
+.edit-btn {
+    background: #24435e;
+    color: white;
+}
+
+.save-btn:hover,
+.edit-btn:hover {
+    opacity: 0.85;
+}
+
+.message {
+    color: #43e6b5;
+    margin-top: 15px;
+}
+
+.summary-section {
+    margin-top: 30px;
+}
+
+.summary-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #24405b;
+    color: #c4d5e6;
+    line-height: 1.5;
+}
+
+.summary-item strong {
+    color: #35dfff;
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    #profileForm,
+    .summary-section {
+        padding: 20px;
+    }
+
+    .page-heading h1 {
+        font-size: 25px;
+    }
+
+    .profile-photo-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .navbar {
+        padding: 17px 5%;
+    }
+}

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AstroLife | Astronaut Health Monitoring System</title>
+
+    <meta name="description"
+        content="AstroLife is an astronaut health monitoring platform designed for long-duration space missions. Developed for the NASA Space Apps Challenge.">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar" id="navbar">
+        <a href="#home" class="logo" aria-label="AstroLife Home">
+            <span class="logo-icon">✦</span>
+            ASTROLIFE
+        </a>
+
+        <div class="nav-status-badge" aria-hidden="true">
+            <span class="eyebrow-pulse"></span>
+            TELEMETRY: NOMINAL
+        </div>
+
+        <button class="menu-toggle" id="menuToggle"
+            aria-label="Toggle navigation" aria-expanded="false">
+            ☰
+        </button>
+
+        <nav id="navMenu">
+            <a href="#home" class="active">Home</a>
+            <a href="#about">About</a>
+            <a href="#hazards">Space Hazards</a>
+            <a href="#features">Features</a>
+            <a href="#research">Research</a>
+            <a href="login.html">Sign In</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button class="nav-button" onclick="getStarted()" aria-label="Get Started with AstroLife">
+                Get Started →
+            </button>
+        </div>
+    </header>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+            <span class="eyebrow">
+                <span class="eyebrow-pulse"></span>
+                THE FUTURE OF SPACE HEALTHCARE
+            </span>
+
+            <h1>
+                Your Health.<br>
+                Your Mission.<br>
+                <span>Your Future.</span>
+            </h1>
+
+            <p>
+                Explore a smarter way to monitor astronaut health.
+                Track physical wellness, radiation exposure, mental
+                health and daily activities during long-duration
+                space missions.
+            </p>
+
+            <div class="hero-buttons">
+
+                <button class="primary-button" onclick="getStarted()">
+                    Get Started <span>→</span>
+                </button>
+
+                <a href="#about" class="secondary-button">
+                    Explore AstroLife
+                </a>
+
+            </div>
+
+            <div class="hero-info">
+                <div class="hero-stat-card">
+                    <strong>24/7</strong>
+                    <span>Health Monitoring</span>
+                </div>
+
+                <div class="hero-stat-card">
+                    <strong>360°</strong>
+                    <span>Health Overview</span>
+                </div>
+
+                <div class="hero-stat-card">
+                    <strong>AI</strong>
+                    <span>Health Insights</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+
+            <div class="planet">
+                <div class="planet-glow"></div>
+            </div>
+
+            <div class="floating-card card-one">
+                <span>♥</span>
+                <div>
+                    <strong>Health Tracking</strong>
+                    <small><span class="telemetry-dot"></span> Continuous monitoring</small>
+                </div>
+            </div>
+
+            <div class="floating-card card-two">
+                <span>☼</span>
+                <div>
+                    <strong>Space Radiation</strong>
+                    <small><span class="telemetry-dot"></span> Exposure awareness</small>
+                </div>
+            </div>
+
+            <div class="floating-card card-three">
+                <span>✧</span>
+                <div>
+                    <strong>Mental Wellness</strong>
+                    <small><span class="telemetry-dot"></span> Daily self-assessment</small>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ABOUT SECTION -->
+    <section class="section about" id="about">
+
+        <div class="section-heading">
+            <span class="eyebrow">
+                <span class="eyebrow-pulse"></span>
+                ABOUT ASTROLIFE
+            </span>
+
+            <h2>
+                Beyond Earth,<br>
+                <span>Health Comes First.</span>
+            </h2>
+
+            <p>
+                Space exploration brings extraordinary opportunities
+                and unique health challenges. AstroLife helps astronauts
+                monitor important health indicators and make informed
+                decisions during their missions.
+            </p>
+        </div>
+
+        <div class="about-grid">
+
+            <div class="about-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">♥</span>
+                </div>
+                <h3>Physical Health</h3>
+                <p>
+                    Monitor heart rate, blood pressure, temperature,
+                    glucose and physical activity.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">☾</span>
+                </div>
+                <h3>Mental Wellness</h3>
+                <p>
+                    Track mood, stress, sleep quality and emotional
+                    well-being.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">☼</span>
+                </div>
+                <h3>Radiation Awareness</h3>
+                <p>
+                    Record radiation exposure and understand
+                    potential space radiation risks.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- SPACE HAZARDS -->
+    <section class="section hazards" id="hazards">
+
+        <div class="section-heading">
+            <span class="eyebrow">
+                <span class="eyebrow-pulse"></span>
+                UNDERSTANDING SPACE
+            </span>
+
+            <h2>
+                The Five Hazards<br>
+                <span>of Spaceflight</span>
+            </h2>
+
+            <p>
+                Long-duration missions expose astronauts to five
+                major hazards that can affect their health.
+            </p>
+        </div>
+
+        <div class="hazard-grid">
+
+            <div class="hazard-card">
+                <div class="hazard-top">
+                    <div class="number">01</div>
+                    <div class="hazard-icon">☼</div>
+                </div>
+                <h3>Space Radiation</h3>
+                <p>
+                    Exposure to space radiation can damage cells
+                    and increase long-term health risks.
+                </p>
+                <span class="tag">Radiation Monitoring</span>
+            </div>
+
+            <div class="hazard-card">
+                <div class="hazard-top">
+                    <div class="number">02</div>
+                    <div class="hazard-icon">♧</div>
+                </div>
+                <h3>Isolation & Confinement</h3>
+                <p>
+                    Separation from family and limited social
+                    interaction can affect mental health.
+                </p>
+                <span class="tag">Mental Wellness</span>
+            </div>
+
+            <div class="hazard-card">
+                <div class="hazard-top">
+                    <div class="number">03</div>
+                    <div class="hazard-icon">⌁</div>
+                </div>
+                <h3>Distance from Earth</h3>
+                <p>
+                    Delayed communication and limited medical
+                    support increase the need for self-assessment.
+                </p>
+                <span class="tag">Self Health Assessment</span>
+            </div>
+
+            <div class="hazard-card">
+                <div class="hazard-top">
+                    <div class="number">04</div>
+                    <div class="hazard-icon">◉</div>
+                </div>
+                <h3>Gravity Fields</h3>
+                <p>
+                    Altered gravity can contribute to bone loss,
+                    muscle weakening and cardiovascular changes.
+                </p>
+                <span class="tag">Physical Health</span>
+            </div>
+
+            <div class="hazard-card">
+                <div class="hazard-top">
+                    <div class="number">05</div>
+                    <div class="hazard-icon">⌂</div>
+                </div>
+                <h3>Hostile Environments</h3>
+                <p>
+                    Closed habitats and environmental conditions
+                    can affect astronaut health and performance.
+                </p>
+                <span class="tag">Environment Monitoring</span>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- FEATURES -->
+    <section class="section features" id="features">
+
+        <div class="section-heading">
+            <span class="eyebrow">
+                <span class="eyebrow-pulse"></span>
+                YOUR MISSION COMPANION
+            </span>
+
+            <h2>
+                Everything You Need.<br>
+                <span>One Platform.</span>
+            </h2>
+
+            <p>
+                A connected health monitoring experience
+                designed for astronauts.
+            </p>
+        </div>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">♥</span>
+                </div>
+                <h3>Health Condition Check</h3>
+                <p>
+                    Record vital signs and understand health trends.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">☼</span>
+                </div>
+                <h3>Radiation Monitoring</h3>
+                <p>
+                    Track exposure measurements and radiation alerts.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">☾</span>
+                </div>
+                <h3>Mental Health</h3>
+                <p>
+                    Assess mood, stress, sleep and emotional wellness.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">◷</span>
+                </div>
+                <h3>Daily Mission Routine</h3>
+                <p>
+                    Manage exercise, nutrition, hydration and rest.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">▥</span>
+                </div>
+                <h3>Health Analytics</h3>
+                <p>
+                    Visualize daily and weekly health changes.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">✧</span>
+                </div>
+                <h3>AI Health Assistant</h3>
+                <p>
+                    Understand health indicators and receive
+                    appropriate guidance.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- RESEARCH -->
+    <section class="section research" id="research">
+
+        <div class="research-content">
+
+            <span class="eyebrow">
+                <span class="eyebrow-pulse"></span>
+                SPACE RESEARCH & INNOVATION
+            </span>
+
+            <h2>
+                Inspired by Space<br>
+                <span>Research.</span>
+            </h2>
+
+            <p>
+                AstroLife incorporates scientific context from
+                space agencies to explain the health challenges
+                astronauts face.
+            </p>
+
+            <div class="research-highlight">
+                <h3>Canadian Active Neutron Spectrometer (CANS)</h3>
+
+                <p>
+                    The Canadian Space Agency highlights the
+                    development of CANS, a compact instrument
+                    designed to continuously measure neutron
+                    radiation exposure in space.
+                </p>
+
+                <a href="https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp"
+                   target="_blank" rel="noopener noreferrer">
+                    Explore CSA Research →
+                </a>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FINAL CTA -->
+    <section class="cta">
+
+        <span class="eyebrow">
+            <span class="eyebrow-pulse"></span>
+            YOUR JOURNEY STARTS HERE
+        </span>
+
+        <h2>
+            Ready for a Healthier<br>
+            <span>Space Mission?</span>
+        </h2>
+
+        <p>
+            Take control of your health. Stay informed.
+            Make every mission safer.
+        </p>
+
+        <button class="primary-button" onclick="getStarted()">
+            Enter AstroLife <span>→</span>
+        </button>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <a href="#home" class="logo">
+            <span class="logo-icon">✦</span>
+            ASTROLIFE
+        </a>
+
+        <p>
+            Supporting astronaut health through intelligent
+            monitoring and data-driven insights.
+        </p>
+
+        <p class="copyright">
+            © <span id="year"></span> AstroLife.
+            Developed for the NASA Space Apps Challenge.
+        </p>
+
+        <p class="disclaimer">
+            AstroLife is a prototype health decision-support
+            platform, not a replacement for professional medical care.
+        </p>
+
+    </footer>
+
+    <!-- Chatling Chatbot Widget -->
+    <script> window.chtlConfig = { chatbotId: "9633574682" } </script>
+<script async data-id="9633574682" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>

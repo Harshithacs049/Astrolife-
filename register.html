@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Astronaut Registration</title>
+    <meta name="description" content="Register an astronaut profile for the AstroLife space health monitoring system.">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            padding: 4px;
+            font-size: 16px;
+            line-height: 1;
+            color: inherit;
+        }
+        #regPassword,
+        #regConfirmPassword {
+            padding-right: 42px;
+        }
+        .form-error {
+            color: #ff4d6d;
+            font-size: 12px;
+            margin-top: 5px;
+            min-height: 16px;
+            font-weight: 500;
+        }
+        .input-invalid {
+            border-color: #ff4d6d !important;
+        }
+        .form-status-banner {
+            display: none;
+            background: rgba(255, 77, 109, 0.12);
+            border: 1px solid #ff4d6d;
+            color: #ff8fa3;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .form-status-banner.visible {
+            display: block;
+        }
+        .form-status-banner.success {
+            background: rgba(46, 213, 115, 0.14);
+            border-color: #2ed573;
+            color: #7bed9f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MINIMAL TOP HEADER -->
+    <header class="auth-header">
+        <a href="index.html" class="logo" aria-label="AstroLife Home">
+            <span class="logo-icon">✦</span>
+            ASTROLIFE
+        </a>
+        <a href="index.html" class="back-home-link">
+            ← Back to Mission Site
+        </a>
+    </header>
+
+    <!-- MAIN AUTH CONTAINER -->
+    <main class="auth-main">
+        <div class="auth-card">
+
+            <div class="auth-title-section">
+                <span class="auth-badge">
+                    <span class="auth-badge-dot"></span>
+                    ROLE & IDENTITY ONBOARDING
+                </span>
+                <h1>Create AstroLife Account</h1>
+                <p>Register with cryptographic security and role-based operational clearance.</p>
+            </div>
+
+            <form id="registerForm" novalidate>
+
+                <!-- FULL NAME -->
+                <div class="form-group">
+                    <label for="regName" class="form-label">Full Name</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="regName" class="form-input" placeholder="e.g. Dr. Alexander Cole" autocomplete="name" required>
+                    </div>
+                    <div id="regNameError" class="form-error"></div>
+                </div>
+
+                <!-- ROLE SELECTION (ASTRONAUT ONLY) -->
+                <div class="form-group">
+                    <label for="regRole" class="form-label">Operational Role Clearance</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✦</span>
+                        <select id="regRole" class="form-input" style="padding-left: 42px;" required>
+                            <option value="astronaut" selected>Astronaut (Crew Health & Bio-Telemetry)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CALLSIGN & STATION / DEPT DROPDOWN (ROW) -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label for="regCallsign" class="form-label">Call Sign / Badge</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📡</span>
+                            <input type="text" id="regCallsign" class="form-input" placeholder="e.g. Orion-1" style="padding-left: 36px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="regDepartment" class="form-label">Station / Dept</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🏛</span>
+                            <select id="regDepartment" class="form-input" style="padding-left: 36px;" required>
+                                <option value="" disabled selected>Select Station / Dept</option>
+                                <option value="ISS-Orbital">ISS Orbital Lab</option>
+                                <option value="JSC-Flight-Med">JSC Flight Med</option>
+                                <option value="Artemis-Lunar-Gateway">Artemis Lunar Gateway</option>
+                                <option value="ISRO-Gaganyaan-Crew">ISRO Gaganyaan Crew</option>
+                                <option value="ESA-EAC-Cologne">ESA Astronaut Centre</option>
+                                <option value="Deep-Space-Transit">Deep Space Transit</option>
+                            </select>
+                        </div>
+                        <div id="regDepartmentError" class="form-error"></div>
+                    </div>
+                </div>
+
+                <!-- EMAIL -->
+                <div class="form-group">
+                    <label for="regEmail" class="form-label">Mission Email (Must end with @gmail.com)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✉</span>
+                        <input type="email" id="regEmail" class="form-input" placeholder="alexander.cole@gmail.com" autocomplete="email" required>
+                    </div>
+                    <div id="regEmailError" class="form-error"></div>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="form-group">
+                    <label for="regPassword" class="form-label">Access Code (Min 8 Characters, Upper/Lower/Num/Symbol)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="regPassword" class="form-input" placeholder="Create robust cryptographic password" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle-btn" data-target="regPassword" aria-label="Toggle password visibility">
+                            👁
+                        </button>
+                    </div>
+                    <!-- Live Password Strength Meter -->
+                    <div style="margin-top: 6px;">
+                        <div style="width: 100%; height: 6px; background: #080d1e; border-radius: 999px; overflow: hidden; border: 1px solid var(--border);">
+                            <div id="pwdStrengthBar" style="width: 0%; height: 100%; transition: width 0.3s ease, background 0.3s ease;"></div>
+                        </div>
+                        <div id="pwdStrengthText" style="font-size: 11px; color: var(--muted); margin-top: 4px;">Enter password to assess strength</div>
+                    </div>
+                    <div id="regPasswordError" class="form-error"></div>
+                </div>
+
+                <!-- CONFIRM PASSWORD -->
+                <div class="form-group">
+                    <label for="regConfirmPassword" class="form-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="regConfirmPassword" class="form-input" placeholder="Re-enter access code" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle-btn" data-target="regConfirmPassword" aria-label="Toggle confirm password visibility">
+                            👁
+                        </button>
+                    </div>
+                    <div id="regConfirmPasswordError" class="form-error"></div>
+                </div>
+
+                <!-- TERMS & CONDITIONS -->
+                <div class="form-group">
+                    <label class="checkbox-label" for="regTerms">
+                        <input type="checkbox" id="regTerms" required>
+                        <span>I accept the <strong style="color: var(--cyan);">AstroLife Mission Protocols</strong> & Prototype Terms</span>
+                    </label>
+                    <div id="regTermsError" class="form-error"></div>
+                </div>
+
+                <!-- STATUS / ERROR BANNER -->
+                <div id="formStatusBanner" class="form-status-banner" role="alert"></div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" id="registerSubmitBtn" class="btn-primary">
+                    Create Mission Account <span>→</span>
+                </button>
+
+            </form>
+
+            <!-- OR DIVIDER -->
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+            <!-- GOOGLE SIGN-IN PLACEHOLDER -->
+            <button type="button" class="btn-google">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Sign up with Google
+            </button>
+            <span class="google-placeholder-tag">✦ Interface placeholder until Firebase Authentication is integrated</span>
+
+            <!-- SWITCH TO LOGIN -->
+            <div class="auth-footer-link">
+                Already registered with mission control?
+                <a href="login.html">Log in here</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- GOOGLE SIGN-IN PLACEHOLDER MODAL -->
+    <div id="googleModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+            <div class="modal-icon">✦</div>
+            <h3 id="modalTitle" class="modal-title">Firebase Auth Placeholder</h3>
+            <p class="modal-text">
+                Google Single Sign-On (SSO) is currently wired as an interface mockup for Phase 2.
+                Real OAuth credentials will be connected when Firebase Authentication backend services are enabled in production.
+            </p>
+            <button type="button" id="closeGoogleModalBtn" class="modal-btn">Understood</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Password Visibility Toggle
+        document.querySelectorAll('.password-toggle-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                btn.textContent = isPassword ? '🙈' : '👁';
+            });
+        });
+
+        // 2. Form Elements
+        const registerForm = document.getElementById('registerForm');
+        const regName = document.getElementById('regName');
+        const regRole = document.getElementById('regRole');
+        const regCallsign = document.getElementById('regCallsign');
+        const regDepartment = document.getElementById('regDepartment');
+        const regEmail = document.getElementById('regEmail');
+        const regPassword = document.getElementById('regPassword');
+        const regConfirmPassword = document.getElementById('regConfirmPassword');
+        const regTerms = document.getElementById('regTerms');
+        const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+
+        const regNameError = document.getElementById('regNameError');
+        const regDepartmentError = document.getElementById('regDepartmentError');
+        const regEmailError = document.getElementById('regEmailError');
+        const regPasswordError = document.getElementById('regPasswordError');
+        const regConfirmPasswordError = document.getElementById('regConfirmPasswordError');
+        const regTermsError = document.getElementById('regTermsError');
+        const formStatusBanner = document.getElementById('formStatusBanner');
+
+        const pwdStrengthBar = document.getElementById('pwdStrengthBar');
+        const pwdStrengthText = document.getElementById('pwdStrengthText');
+
+        // 3. Validation Functions
+        function validateEmail(email) {
+            const trimmed = email.trim();
+            if (!trimmed) return "Email is wrong: Mission email is required.";
+            const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+            if (!gmailRegex.test(trimmed)) {
+                return "Email is wrong: Address must end with @gmail.com.";
+            }
+            return "";
+        }
+
+        function getPasswordChecks(pwd) {
+            return {
+                length: pwd.length >= 8,
+                upper: /[A-Z]/.test(pwd),
+                lower: /[a-z]/.test(pwd),
+                number: /[0-9]/.test(pwd),
+                symbol: /[^A-Za-z0-9]/.test(pwd)
+            };
+        }
+
+        function validatePassword(pwd) {
+            if (!pwd) return "Password is required.";
+            const checks = getPasswordChecks(pwd);
+            const missing = [];
+            if (!checks.length) missing.push("at least 8 characters");
+            if (!checks.upper) missing.push("1 uppercase letter");
+            if (!checks.lower) missing.push("1 lowercase letter");
+            if (!checks.number) missing.push("1 number");
+            if (!checks.symbol) missing.push("1 special symbol");
+
+            if (missing.length > 0) {
+                return "Password invalid: Must contain " + missing.join(", ") + ".";
+            }
+            return "";
+        }
+
+        // Live Password Strength Meter
+        regPassword.addEventListener('input', () => {
+            const pwd = regPassword.value;
+            const checks = getPasswordChecks(pwd);
+            const score = Object.values(checks).filter(Boolean).length;
+
+            const colors = ['#ff4d6d', '#ff4d6d', '#ffa502', '#eccc68', '#7bed9f', '#2ed573'];
+            const labels = [
+                'Enter password to assess strength',
+                'Very Weak (Min 8 chars, Upper, Lower, Num, Symbol)',
+                'Weak (Missing required character types)',
+                'Fair (Almost meets security protocols)',
+                'Strong (1 requirement remaining)',
+                'Cryptographically Strong ✓'
+            ];
+
+            pwdStrengthBar.style.width = `${(score / 5) * 100}%`;
+            pwdStrengthBar.style.background = colors[score];
+            pwdStrengthText.textContent = pwd ? labels[score] : labels[0];
+            pwdStrengthText.style.color = pwd ? colors[score] : 'var(--muted)';
+
+            if (regPasswordError.textContent) {
+                const err = validatePassword(pwd);
+                regPasswordError.textContent = err;
+                regPassword.classList.toggle('input-invalid', Boolean(err));
+            }
+            if (regConfirmPassword.value) {
+                const matchErr = regConfirmPassword.value !== pwd ? "Passwords do not match in both fields." : "";
+                regConfirmPasswordError.textContent = matchErr;
+                regConfirmPassword.classList.toggle('input-invalid', Boolean(matchErr));
+            }
+        });
+
+        // Live Confirm Password Check
+        regConfirmPassword.addEventListener('input', () => {
+            if (regConfirmPassword.value !== regPassword.value) {
+                regConfirmPasswordError.textContent = "Passwords do not match in both fields.";
+                regConfirmPassword.classList.add('input-invalid');
+            } else {
+                regConfirmPasswordError.textContent = "";
+                regConfirmPassword.classList.remove('input-invalid');
+            }
+        });
+
+        // 4. Local Storage Save + Redirect to login.html
+        function saveUserLocally(userObj) {
+            // Store list of all registered users
+            const existingUsers = JSON.parse(localStorage.getItem('astrolife_users') || '[]');
+            const filteredUsers = existingUsers.filter(
+                (u) => u.email.toLowerCase() !== userObj.email.toLowerCase()
+            );
+            filteredUsers.push(userObj);
+            localStorage.setItem('astrolife_users', JSON.stringify(filteredUsers));
+
+            // Also store the most recently registered user for easy autofill/lookup on login.html
+            localStorage.setItem('astrolife_registered_user', JSON.stringify(userObj));
+        }
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const failureReasons = [];
+
+            // Validate Name
+            if (!regName.value.trim()) {
+                regNameError.textContent = "Full name is required.";
+                regName.classList.add('input-invalid');
+                failureReasons.push("Full Name is empty.");
+            } else {
+                regNameError.textContent = "";
+                regName.classList.remove('input-invalid');
+            }
+
+            // Validate Station / Dept
+            if (!regDepartment.value) {
+                regDepartmentError.textContent = "Please select a Station / Dept.";
+                regDepartment.classList.add('input-invalid');
+                failureReasons.push("Station / Dept is not selected.");
+            } else {
+                regDepartmentError.textContent = "";
+                regDepartment.classList.remove('input-invalid');
+            }
+
+            // Validate Email (@gmail.com)
+            const emailErr = validateEmail(regEmail.value);
+            regEmailError.textContent = emailErr;
+            regEmail.classList.toggle('input-invalid', Boolean(emailErr));
+            if (emailErr) failureReasons.push(emailErr);
+
+            // Validate Password Conditions
+            const pwdErr = validatePassword(regPassword.value);
+            regPasswordError.textContent = pwdErr;
+            regPassword.classList.toggle('input-invalid', Boolean(pwdErr));
+            if (pwdErr) failureReasons.push(pwdErr);
+
+            // Validate Confirm Password Match
+            if (!regConfirmPassword.value) {
+                regConfirmPasswordError.textContent = "Please confirm your password.";
+                regConfirmPassword.classList.add('input-invalid');
+                failureReasons.push("Confirm Password field is empty.");
+            } else if (regConfirmPassword.value !== regPassword.value) {
+                regConfirmPasswordError.textContent = "Passwords do not match in both fields.";
+                regConfirmPassword.classList.add('input-invalid');
+                failureReasons.push("Password and Confirm Password do not match.");
+            } else {
+                regConfirmPasswordError.textContent = "";
+                regConfirmPassword.classList.remove('input-invalid');
+            }
+
+            // Validate Terms
+            if (!regTerms.checked) {
+                regTermsError.textContent = "You must accept the AstroLife Mission Protocols.";
+                failureReasons.push("Mission Protocols checkbox is not checked.");
+            } else {
+                regTermsError.textContent = "";
+            }
+
+            // If invalid, show reasons and stop
+            if (failureReasons.length > 0) {
+                formStatusBanner.classList.remove('success');
+                formStatusBanner.innerHTML =
+                    `<strong>Registration failed due to the following:</strong><br>• ${failureReasons.join('<br>• ')}`;
+                formStatusBanner.classList.add('visible');
+                return;
+            }
+
+            // Build user profile and save to localStorage
+            const newUser = {
+                fullName: regName.value.trim(),
+                role: regRole.value,
+                callsign: regCallsign.value.trim() || "Astronaut-01",
+                department: regDepartment.value,
+                email: regEmail.value.trim().toLowerCase(),
+                password: regPassword.value,
+                registeredAt: new Date().toISOString()
+            };
+
+            saveUserLocally(newUser);
+
+            // Show success confirmation and redirect to login.html
+            formStatusBanner.classList.add('success', 'visible');
+            formStatusBanner.innerHTML =
+                `<strong>✓ Account Created!</strong> Profile saved locally. Redirecting to login page...`;
+            registerSubmitBtn.disabled = true;
+            registerSubmitBtn.textContent = "Redirecting to Login...";
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        }, true);
+    </script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

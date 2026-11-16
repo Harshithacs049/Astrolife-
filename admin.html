@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Administrator Console & System Configuration</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .admin-nav-tabs {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+        }
+        .admin-tab-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            background: rgba(16, 26, 50, 0.6);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .admin-tab-btn:hover,
+        .admin-tab-btn.is-active {
+            color: #fff;
+            border-color: var(--cyan);
+            background: rgba(56, 189, 248, 0.15);
+        }
+        .admin-section {
+            display: none;
+        }
+        .admin-section.is-active {
+            display: block;
+        }
+        .threshold-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            font-size: 13px;
+        }
+        .threshold-row:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+        .threshold-header {
+            font-weight: 700;
+            color: var(--cyan);
+            text-transform: uppercase;
+            font-size: 11px;
+            background: rgba(13, 20, 40, 0.9);
+            border-radius: 8px 8px 0 0;
+        }
+        .user-action-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <!-- TOP NAVIGATION -->
+        <header class="dashboard-nav">
+            <a href="index.html" class="logo" aria-label="AstroLife Home">
+                <span class="logo-icon">✦</span> ASTROLIFE
+            </a>
+
+            <div class="user-profile">
+                <div id="userAvatar" class="user-avatar" style="background: #ef4444; color: #fff;">A</div>
+                <div>
+                    <div id="dashboardUserName" class="user-name-display">Director Marcus Vance</div>
+                    <div class="user-role-badge">
+                        <span class="auth-badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);">✦ ADMINISTRATOR • NASA OPERATIONS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="dashboard.html" class="back-home-link">Astronaut Console</a>
+                <a href="mission-control.html" class="back-home-link">Mission Control</a>
+                <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+            </div>
+        </header>
+
+        <!-- MAIN ADMIN CONSOLE -->
+        <main class="dashboard-body">
+
+            <!-- HEADER BANNER -->
+            <section class="welcome-banner" style="margin-bottom: 24px;">
+                <span class="auth-badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);">
+                    <span class="auth-badge-dot" style="background: #f87171;"></span> SYSTEM CONFIGURATION & ROLE-BASED ACCESS CONTROL
+                </span>
+                <h1>Administrator Console <span>& Clinical Monitoring Thresholds</span></h1>
+                <p>
+                    Manage registered users across roles (Astronaut, Mission Control, Administrator), configure 
+                    scientifically sourced NASA reference limits, customize mission flight parameters, and inspect security audit logs.
+                </p>
+            </section>
+
+            <!-- NAVIGATION TABS -->
+            <div class="admin-nav-tabs">
+                <button type="button" class="admin-tab-btn is-active" data-tab="tabUsers">User Management & Roles</button>
+                <button type="button" class="admin-tab-btn" data-tab="tabThresholds">Physiological Reference Limits</button>
+                <button type="button" class="admin-tab-btn" data-tab="tabMission">Mission Parameters</button>
+                <button type="button" class="admin-tab-btn" data-tab="tabAudit">Security & Audit Logs</button>
+            </div>
+
+            <!-- TAB 1: USER MANAGEMENT -->
+            <section id="tabUsers" class="admin-section is-active">
+                <div class="panel-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 17px;">Registered Users & Operational Roles</h3>
+                            <p style="font-size: 12px; color: var(--muted); margin: 4px 0 0;">Manage access authorization, assign roles, and toggle user activation status.</p>
+                        </div>
+                        <button type="button" id="openAddUserBtn" class="btn-primary" style="padding: 8px 16px; font-size: 12px; width: auto;">
+                            + Add New User
+                        </button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Call Sign</th>
+                                    <th>Role Clearance</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Populated by admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: PHYSIOLOGICAL REFERENCE LIMITS -->
+            <section id="tabThresholds" class="admin-section">
+                <div class="panel-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 17px;">Configurable Scientifically Sourced Physiological Reference Limits</h3>
+                            <p style="font-size: 12px; color: var(--muted); margin: 4px 0 0;">
+                                Reference Standard: NASA-STD-3001 (Human-System Standard Vol 1: Crew Health) & ISS MORD Medical Specifications.
+                            </p>
+                        </div>
+                        <button type="button" id="saveThresholdsBtn" class="btn-primary" style="padding: 8px 18px; font-size: 12px; width: auto;">
+                            Save Updated Thresholds 💾
+                        </button>
+                    </div>
+
+                    <div class="threshold-row threshold-header">
+                        <div>Health Indicator & Standard Reference</div>
+                        <div>Safe Range</div>
+                        <div>Warning (Low)</div>
+                        <div>Warning (High)</div>
+                        <div>Critical Threshold</div>
+                    </div>
+
+                    <div id="thresholdRowsContainer">
+                        <!-- Populated by admin.js -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MISSION PARAMETERS -->
+            <section id="tabMission" class="admin-section">
+                <div class="panel-box" style="max-width: 680px;">
+                    <h3 style="margin-bottom: 16px; font-size: 17px;">Mission Configuration Parameters</h3>
+                    <form id="missionConfigForm">
+                        <div class="form-group" style="margin-bottom: 14px;">
+                            <label class="form-label">Mission Designation Name</label>
+                            <input type="text" id="cfgMissionName" class="form-input" value="Artemis VII - Mars Transit Mission" required>
+                        </div>
+
+                        <div class="form-row-2" style="margin-bottom: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">Launch Date (UTC)</label>
+                                <input type="date" id="cfgLaunchDate" class="form-input" value="2026-10-04" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Total Mission Duration (Days)</label>
+                                <input type="number" id="cfgDurationDays" class="form-input" value="180" min="1" max="1000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2" style="margin-bottom: 20px;">
+                            <div class="form-group">
+                                <label class="form-label">Current Mission Sol</label>
+                                <input type="number" id="cfgCurrentSol" class="form-input" value="42" min="1" max="1000" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Spacecraft / Habitational Complex</label>
+                                <input type="text" id="cfgSpacecraft" class="form-input" value="Orion Crew Module / Deep Space Habitat" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: auto; padding: 10px 24px;">
+                            Update Flight Parameters →
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 4: AUDIT LOGS -->
+            <section id="tabAudit" class="admin-section">
+                <div class="panel-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="margin: 0; font-size: 17px;">Security & Operational Audit Trail</h3>
+                        <span style="font-size: 12px; color: var(--muted);">Real-time cryptographic audit log</span>
+                    </div>
+
+                    <div style="overflow-x: auto; max-height: 400px;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Event Type</th>
+                                    <th>Actor</th>
+                                    <th>Audit Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ADD USER MODAL -->
+    <div id="addUserModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="addUserTitle">
+        <div class="modal-box-wide">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 id="addUserTitle" style="color: #fff; font-size: 18px; margin: 0;">Add User & Assign Role Clearance</h3>
+                <button type="button" class="btn-close-modal" style="color: var(--muted); font-size: 20px; background: none; border: none; cursor: pointer;">✕</button>
+            </div>
+
+            <form id="adminAddUserForm">
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="addUserName" class="form-input" placeholder="e.g. Flight Engineer Mateo Silva" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label">Mission Email</label>
+                    <input type="email" id="addUserEmail" class="form-input" placeholder="mateo.silva@astrolife.space" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label">Role Clearance</label>
+                    <select id="addUserRole" class="form-input">
+                        <option value="astronaut">Astronaut (Crew Bio-Telemetry Access)</option>
+                        <option value="mission-control">Mission Control / Medical (Flight Surgeon Fleet Monitor)</option>
+                        <option value="administrator">Administrator (System Configurations & RBAC)</option>
+                    </select>
+                </div>
+
+                <div class="form-row-2" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label class="form-label">Call Sign / Badge</label>
+                        <input type="text" id="addUserCallsign" class="form-input" placeholder="e.g. Orion-3">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <input type="text" id="addUserDepartment" class="form-input" placeholder="e.g. Flight Operations">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Initial Access Code / Password</label>
+                    <input type="password" id="addUserPassword" class="form-input" placeholder="Min 8 characters with numbers & symbols" required>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn-close-modal btn-fill-demo" style="padding: 10px 18px;">Cancel</button>
+                    <button type="submit" class="btn-primary" style="width: auto; padding: 10px 22px;">Create Account →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Guard role: only administrator can access
+            if (window.AstroAuth) {
+                const allowed = AstroAuth.requireRole(["administrator"]);
+                if (!allowed) return;
+            }
+
+            // Tab Navigation
+            const tabButtons = document.querySelectorAll(".admin-tab-btn");
+            const tabSections = document.querySelectorAll(".admin-section");
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const targetTab = this.getAttribute("data-tab");
+                    tabButtons.forEach(b => b.classList.remove("is-active"));
+                    tabSections.forEach(s => s.classList.remove("is-active"));
+                    this.classList.add("is-active");
+                    const sec = document.getElementById(targetTab);
+                    if (sec) sec.classList.add("is-active");
+                });
+            });
+
+            // Render Users Table
+            function renderUsers() {
+                const tbody = document.getElementById("usersTableBody");
+                if (!tbody) return;
+                const users = AstroAuth.getAllUsers();
+                tbody.innerHTML = "";
+
+                users.forEach(u => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><strong>${u.name}</strong></td>
+                        <td>${u.email}</td>
+                        <td style="color: var(--cyan);">${u.callsign || "-"}</td>
+                        <td>
+                            <select class="form-input role-selector" data-user-id="${u.id}" style="padding: 4px 8px; font-size: 11px; width: auto;">
+                                <option value="astronaut" ${u.role === 'astronaut' ? 'selected' : ''}>Astronaut</option>
+                                <option value="mission-control" ${u.role === 'mission-control' ? 'selected' : ''}>Mission Control</option>
+                                <option value="administrator" ${u.role === 'administrator' ? 'selected' : ''}>Administrator</option>
+                            </select>
+                        </td>
+                        <td style="color: var(--muted); font-size: 11px;">${u.department || "-"}</td>
+                        <td>
+                            <span class="status-pill ${u.active ? 'status-safe' : 'status-critical'}" style="font-size: 10px;">
+                                ${u.active ? 'ACTIVE' : 'DEACTIVATED'}
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" class="user-action-btn toggle-active-btn" data-user-id="${u.id}" style="background: ${u.active ? 'rgba(248, 113, 113, 0.2)' : 'rgba(74, 222, 128, 0.2)'}; color: ${u.active ? '#f87171' : '#4ade80'};">
+                                ${u.active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Attach change listeners
+                document.querySelectorAll(".role-selector").forEach(sel => {
+                    sel.addEventListener("change", function () {
+                        const uid = this.getAttribute("data-user-id");
+                        AstroAuth.updateUserRole(uid, this.value);
+                        alert(`User role updated to ${this.value}.`);
+                    });
+                });
+
+                document.querySelectorAll(".toggle-active-btn").forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const uid = this.getAttribute("data-user-id");
+                        const status = AstroAuth.toggleUserActive(uid);
+                        renderUsers();
+                    });
+                });
+            }
+
+            // Render Thresholds
+            function renderThresholds() {
+                const container = document.getElementById("thresholdRowsContainer");
+                if (!container) return;
+                const cfg = AstroAuth.getConfig();
+                const th = cfg.thresholds;
+                container.innerHTML = "";
+
+                Object.keys(th).forEach(k => {
+                    const item = th[k];
+                    const row = document.createElement("div");
+                    row.className = "threshold-row";
+                    row.innerHTML = `
+                        <div>
+                            <strong style="color: #fff; display: block;">${item.name}</strong>
+                            <small style="color: var(--muted); font-size: 11px;">Unit: ${item.unit} • Ref: NASA-STD-3001</small>
+                        </div>
+                        <div>
+                            <input type="number" step="0.1" class="form-input th-input" data-key="${k}" data-field="safeMin" value="${item.safeMin}" style="width: 60px; padding: 4px 6px; display: inline;">
+                            -
+                            <input type="number" step="0.1" class="form-input th-input" data-key="${k}" data-field="safeMax" value="${item.safeMax}" style="width: 60px; padding: 4px 6px; display: inline;">
+                        </div>
+                        <div>
+                            <input type="number" step="0.1" class="form-input th-input" data-key="${k}" data-field="warnMin" value="${item.warnMin}" style="width: 65px; padding: 4px 6px;">
+                        </div>
+                        <div>
+                            <input type="number" step="0.1" class="form-input th-input" data-key="${k}" data-field="warnMax" value="${item.warnMax}" style="width: 65px; padding: 4px 6px;">
+                        </div>
+                        <div>
+                            <span style="color: #f87171; font-size: 11px;">&lt; ${item.critMin} or &gt; ${item.critMax}</span>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            // Save Thresholds Button
+            const saveThresholdsBtn = document.getElementById("saveThresholdsBtn");
+            if (saveThresholdsBtn) {
+                saveThresholdsBtn.addEventListener("click", function () {
+                    const cfg = AstroAuth.getConfig();
+                    document.querySelectorAll(".th-input").forEach(input => {
+                        const key = input.getAttribute("data-key");
+                        const field = input.getAttribute("data-field");
+                        if (cfg.thresholds[key]) {
+                            cfg.thresholds[key][field] = parseFloat(input.value);
+                        }
+                    });
+                    AstroAuth.saveConfig(cfg);
+                    alert("NASA-STD-3001 physiological monitoring thresholds saved and broadcast to all mission consoles!");
+                });
+            }
+
+            // Render Audit Logs
+            function renderAudit() {
+                const tbody = document.getElementById("auditTableBody");
+                if (!tbody) return;
+                const logs = AstroAuth.getAuditLogs();
+                tbody.innerHTML = "";
+
+                if (logs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--muted);">No security events recorded.</td></tr>`;
+                    return;
+                }
+
+                logs.forEach(l => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="color: var(--muted); font-size: 11px;">${new Date(l.timestamp).toLocaleTimeString()}</td>
+                        <td><span class="auth-badge" style="font-size: 10px; padding: 2px 6px;">${l.event}</span></td>
+                        <td style="color: var(--cyan);">${l.actor}</td>
+                        <td style="font-size: 12px; color: var(--text-primary);">${l.details}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Mission Config Form
+            const missionForm = document.getElementById("missionConfigForm");
+            if (missionForm) {
+                const cfg = AstroAuth.getConfig();
+                if (cfg && cfg.mission) {
+                    document.getElementById("cfgMissionName").value = cfg.mission.name;
+                    document.getElementById("cfgLaunchDate").value = cfg.mission.launchDate;
+                    document.getElementById("cfgDurationDays").value = cfg.mission.durationDays;
+                    document.getElementById("cfgCurrentSol").value = cfg.mission.currentSol;
+                    document.getElementById("cfgSpacecraft").value = cfg.mission.spacecraft;
+                }
+
+                missionForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    const updated = AstroAuth.getConfig();
+                    updated.mission = {
+                        name: document.getElementById("cfgMissionName").value,
+                        launchDate: document.getElementById("cfgLaunchDate").value,
+                        durationDays: parseInt(document.getElementById("cfgDurationDays").value, 10),
+                        currentSol: parseInt(document.getElementById("cfgCurrentSol").value, 10),
+                        spacecraft: document.getElementById("cfgSpacecraft").value
+                    };
+                    AstroAuth.saveConfig(updated);
+                    alert("Mission flight parameters updated successfully!");
+                });
+            }
+
+            // Add User Modal
+            const openAddBtn = document.getElementById("openAddUserBtn");
+            const addUserModal = document.getElementById("addUserModal");
+            const addUserForm = document.getElementById("adminAddUserForm");
+
+            if (openAddBtn && addUserModal) {
+                openAddBtn.addEventListener("click", () => addUserModal.classList.add("is-active"));
+            }
+
+            document.querySelectorAll(".btn-close-modal").forEach(btn => {
+                btn.addEventListener("click", () => addUserModal.classList.remove("is-active"));
+            });
+
+            if (addUserForm) {
+                addUserForm.addEventListener("submit", async function (e) {
+                    e.preventDefault();
+                    const name = document.getElementById("addUserName").value;
+                    const email = document.getElementById("addUserEmail").value;
+                    const role = document.getElementById("addUserRole").value;
+                    const callsign = document.getElementById("addUserCallsign").value;
+                    const department = document.getElementById("addUserDepartment").value;
+                    const pwd = document.getElementById("addUserPassword").value;
+
+                    const res = await AstroAuth.register({ name, email, role, callsign, department, password: pwd });
+                    if (res.success) {
+                        alert(`User ${name} successfully registered with ${role} clearance.`);
+                        addUserModal.classList.remove("is-active");
+                        addUserForm.reset();
+                        renderUsers();
+                        renderAudit();
+                    } else {
+                        alert(`Error: ${res.message}`);
+                    }
+                });
+            }
+
+            // Initial render
+            renderUsers();
+            renderThresholds();
+            renderAudit();
+        });
+    </script>
+</body>
+</html>

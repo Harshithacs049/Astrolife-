@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Astronaut Profile</title>
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="dashboard.html" class="logo" style="display: flex; align-items: center; gap: 8px;">✦ ASTROLIFE</a>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <a href="dashboard.html" style="color: #35dfff; text-decoration: none; font-size: 14px; font-weight: 600;">← Mission Dashboard</a>
+        <span class="nav-label">Astronaut Profile</span>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <p class="tag">MISSION ONBOARDING</p>
+        <h1>Create Your Astronaut Profile</h1>
+        <p>Set up your profile to begin monitoring your health during your mission.</p>
+    </section>
+
+    <form id="profileForm">
+
+        <!-- Profile photo -->
+        <section class="profile-photo-section">
+            <div class="photo-preview" id="photoPreview">
+                <span>👨‍🚀</span>
+            </div>
+
+            <div>
+                <h3>Profile Photograph</h3>
+                <p>Upload your astronaut profile photo.</p>
+                <input type="file" id="profilePhoto"
+                       accept="image/png, image/jpeg, image/webp">
+            </div>
+        </section>
+
+        <!-- Personal information -->
+        <section class="form-section">
+            <h2>01. Personal Information</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" required
+                           placeholder="Enter your full name">
+                </div>
+
+                <div class="field">
+                    <label for="age">Age *</label>
+                    <input type="number" id="age" min="18" max="100"
+                           required placeholder="Enter age">
+                </div>
+
+                <div class="field">
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                        <option value="">Select gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="bloodGroup">Blood Group</label>
+                    <select id="bloodGroup">
+                        <option value="">Select blood group</option>
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                        <option>Unknown</option>
+                    </select>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Physical information -->
+        <section class="form-section">
+            <h2>02. Physical Information</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" id="height" min="1"
+                           max="300" placeholder="e.g. 175">
+                </div>
+
+                <div class="field">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" id="weight" min="1"
+                           max="500" step="0.1" placeholder="e.g. 70">
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Medical information -->
+        <section class="form-section">
+            <h2>03. Medical Information</h2>
+
+            <div class="field">
+                <label for="medicalHistory">Medical History</label>
+                <textarea id="medicalHistory" rows="4"
+                    placeholder="Enter relevant medical history"></textarea>
+            </div>
+
+            <div class="field">
+                <label for="allergies">Known Allergies</label>
+                <textarea id="allergies" rows="3"
+                    placeholder="Enter known allergies, or write None"></textarea>
+            </div>
+
+            <p class="note">
+                Medical information is for the prototype only.
+                It must be handled securely in the production application.
+            </p>
+        </section>
+
+        <!-- Emergency contact -->
+        <section class="form-section">
+            <h2>04. Emergency Contact</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="emergencyName">Contact Person *</label>
+                    <input type="text" id="emergencyName" required
+                           placeholder="Enter contact person's name">
+                </div>
+
+                <div class="field">
+                    <label for="emergencyPhone">Phone Number *</label>
+                    <input type="tel" id="emergencyPhone" required
+                           placeholder="Enter phone number">
+                </div>
+
+                <div class="field">
+                    <label for="relationship">Relationship</label>
+                    <input type="text" id="relationship"
+                           placeholder="e.g. Parent, Spouse">
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Mission information -->
+        <section class="form-section">
+            <h2>05. Mission Information</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label for="missionName">Mission Name *</label>
+                    <input type="text" id="missionName" required
+                           placeholder="Enter mission name">
+                </div>
+
+                <div class="field">
+                    <label for="launchDate">Launch Date</label>
+                    <input type="date" id="launchDate">
+                </div>
+
+                <div class="field">
+                    <label for="missionDuration">Mission Duration (days)</label>
+                    <input type="number" id="missionDuration" min="1"
+                           placeholder="e.g. 180">
+                </div>
+
+            </div>
+        </section>
+
+        <button type="submit" class="save-btn">
+            Save Astronaut Profile →
+        </button>
+
+        <p id="formMessage" class="message"></p>
+
+    </form>
+
+    <!-- Profile summary -->
+    <section id="profileSummary" class="summary-section" hidden>
+        <h2>Profile Preview</h2>
+        <div id="summaryContent"></div>
+        <button type="button" id="editProfile" class="edit-btn">
+            Edit Profile
+        </button>
+        <button type="button" id="continueBtn" class="save-btn">
+            Continue to AstroLife Dashboard →
+        </button>
+    </section>
+</main>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>
+</main>

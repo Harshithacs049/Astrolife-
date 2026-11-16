@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroLife | Daily Health Assessment</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .checkin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .panel-box {
+            background: rgba(13, 20, 40, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px;
+        }
+        .panel-box h3 {
+            font-size: 17px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 900px) {
+            .checkin-grid { grid-template-columns: 1fr; }
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <header class="dashboard-nav">
+        <a href="index.html" class="logo"><span class="logo-icon">✦</span> ASTROLIFE</a>
+        <div class="dashboard-actions">
+            <a href="dashboard.html" class="back-home-link">← Main Dashboard</a>
+            <button type="button" id="logoutBtn" class="btn-logout">End Session</button>
+        </div>
+    </header>
+
+    <main class="dashboard-body">
+        <section class="welcome-banner">
+            <span class="auth-badge"><span class="auth-badge-dot"></span> DAILY CREW ASSESSMENT</span>
+            <h1>Comprehensive <span>Daily Health Check-In</span></h1>
+            <p>
+                Record your daily vital signs, physical symptoms, sleep continuity, and psychological well-being. 
+                Submissions automatically trigger the AI risk analysis engine and update your mission telemetry profile.
+            </p>
+        </section>
+
+        <div class="checkin-grid">
+            <!-- Assessment Form -->
+            <div class="panel-box">
+                <h3>Today's Health Assessment</h3>
+                <form id="dailyCheckinForm">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Heart Rate (bpm)</label>
+                            <input type="number" id="checkinHr" class="form-input" value="65" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Blood Pressure (mmHg)</label>
+                            <input type="text" id="checkinBp" class="form-input" value="118/76" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Temperature (°C)</label>
+                            <input type="number" step="0.1" id="checkinTemp" class="form-input" value="36.7" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Oxygen Saturation ($SpO_2$ %)</label>
+                            <input type="number" id="checkinSpo2" class="form-input" value="98" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Sleep Duration (Hours)</label>
+                            <input type="number" step="0.5" id="checkinSleep" class="form-input" value="7.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pain Level (0 = None, 10 = Severe)</label>
+                            <input type="number" min="0" max="10" id="checkinPain" class="form-input" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Mood Score (1-10)</label>
+                            <input type="number" min="1" max="10" id="checkinMood" class="form-input" value="8" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stress Level (1-10)</label>
+                            <input type="number" min="1" max="10" id="checkinStress" class="form-input" value="2" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Fatigue & Physical Symptoms</label>
+                        <select id="checkinSymptoms" class="form-input" style="padding-left: 14px;">
+                            <option value="None / Asymptomatic">None / Asymptomatic</option>
+                            <option value="Mild Vestibular Dizziness">Mild Vestibular Dizziness</option>
+                            <option value="Headache / Sinus Pressure">Headache / Sinus Pressure</option>
+                            <option value="Muscular Fatigue / Soreness">Muscular Fatigue / Soreness</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width: 100%;">Submit Daily Check-In →</button>
+                </form>
+            </div>
+
+            <!-- Analysis & Summary Result Panel -->
+            <div class="panel-box">
+                <h3>Assessment Summary & Analysis</h3>
+                <div id="checkinSummaryBox" style="background: rgba(56, 189, 248, 0.06); border: 1px dashed rgba(56, 189, 248, 0.35); border-radius: 12px; padding: 20px;">
+                    <strong style="color: var(--cyan); display: block; margin-bottom: 8px;">✦ Status: Awaiting Submission</strong>
+                    <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">
+                        Complete and submit the daily check-in form to generate automated screening summaries, detect changes over time, and receive personalized countermeasure recommendations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("dailyCheckinForm");
+    const summaryBox = document.getElementById("checkinSummaryBox");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const hr = Number(document.getElementById("checkinHr").value);
+        const bp = document.getElementById("checkinBp").value;
+        const sleep = Number(document.getElementById("checkinSleep").value);
+        const pain = Number(document.getElementById("checkinPain").value);
+        const symptoms = document.getElementById("checkinSymptoms").value;
+
+        let statusColor = "#4ade80";
+        let statusTitle = "NOMINAL BASELINE DETECTED";
+        let recommendations = "Vitals and wellness indicators are stable. Maintain scheduled physical exercise and hydration routines.";
+
+        if (pain > 4 || hr > 110 || symptoms !== "None / Asymptomatic") {
+            statusColor = "#f87171";
+            statusTitle = "CONCERNING SYMPTOMS FLAGGED";
+            recommendations = `Reported symptoms (${symptoms}) or elevated pain/HR require closer monitoring. Review local emergency protocols and notify flight surgeon if symptoms persist.`;
+        } else if (sleep < 6.0) {
+            statusColor = "#facc15";
+            statusTitle = "SLEEP DEFICIT WARNING";
+            recommendations = "Sleep duration is below optimal threshold. Prioritize 8 hours of rest during upcoming circadian sleep cycle.";
+        }
+
+        summaryBox.innerHTML = `
+            <strong style="color: ${statusColor}; display: block; margin-bottom: 8px;">✦ Status: ${statusTitle}</strong>
+            <p style="font-size: 13px; color: var(--text-primary); line-height: 1.6; margin-bottom: 12px;">
+                <strong>Vitals Summary:</strong> HR ${hr} bpm, BP ${bp}, Sleep ${sleep} hrs, Pain Level ${pain}/10.<br>
+                <strong>Symptoms Note:</strong> ${symptoms}.
+            </p>
+            <div style="border-top: 1px solid var(--border); padding-top: 10px; font-size: 12px; color: var(--muted);">
+                <strong style="color: var(--cyan);">AI Recommendations:</strong> ${recommendations}
+            </div>
+        `;
+
+        localStorage.setItem("astrolife_last_checkin", JSON.stringify({ hr, bp, sleep, pain, symptoms, timestamp: new Date().toISOString() }));
+        alert("Daily health check-in successfully submitted and analyzed!");
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07111f">
+    <title>AstroLife | Astronaut Health Dashboard & Real-Time Telemetry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root{--bg:#07111f;--panel:#0d1b2c;--panel2:#102238;--line:#20364d;--text:#edf5ff;--muted:#9aafc4;--blue:#45b9ff;--purple:#b69aff;--green:#4cdda0;--amber:#ffc45c;--red:#ff6474;--shadow:0 16px 45px #0005;--border:#20364d;--cyan:#38bdf8}
+        *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% -10%,#17365a 0,transparent 35%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+        
+        .dashboard-wrapper{max-width:1500px;margin:auto;padding:22px}
+        
+        /* TOP NAVIGATION */
+        .dashboard-nav{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;background:#0b1a2bd9;border:1px solid var(--line);border-radius:18px;position:sticky;top:10px;z-index:5;backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+        .logo{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:2px;color:var(--text);text-decoration:none}
+        .logo-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#176b9f,#273d78);font-size:23px}
+        
+        .user-profile{display:flex;align-items:center;gap:12px}
+        .user-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+        .user-name-display{font-size:13px;font-weight:700;color:var(--text)}
+        .user-role-badge{margin-top:2px}
+        
+        .dashboard-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+        .back-home-link,.btn-logout{border:1px solid var(--line);border-radius:10px;padding:10px 13px;background:#102238;color:var(--text);font-size:12px;font-weight:700;text-decoration:none}
+        .btn-logout{background:#341923;border-color:#8f3e4b;color:#ff9ba5}
+        .back-home-link:hover,.btn-logout:hover{filter:brightness(1.15)}
+
+        /* ALERTS STRIP & TOAST */
+        .alert-strip{display:none;padding:14px 17px;border:1px solid #b74455;background:#431e2a;border-radius:13px;margin:15px 0;animation:pulse 1.2s infinite;align-items:center;justify-content:space-between;gap:12px}
+        .alert-strip.show{display:flex}
+        @keyframes pulse{50%{box-shadow:0 0 0 4px #ff647422}}
+        .toast{position:fixed;bottom:20px;right:20px;z-index:30;background:#18334a;border:1px solid #36749b;padding:13px 17px;border-radius:11px;font-size:12px;display:none;max-width:330px}
+        .toast.show{display:block}
+
+        /* MISSION STATUS BAR */
+        .mission-status-bar{display:grid;grid-template-columns:1fr auto;gap:15px;background:#0b1929;border:1px solid var(--line);border-radius:16px;padding:16px;align-items:center}
+        .mission-meta-group{display:flex;gap:15px;flex-wrap:wrap}
+        .meta-pill{padding:8px 12px;background:#071523;border:1px solid var(--line);border-radius:10px;font-size:11px}
+        .meta-pill small{display:block;color:var(--muted);margin-bottom:2px}
+
+        /* TAB NAVIGATION STYLES */
+        .dash-nav-tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(8, 13, 30, 0.9);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin: 24px 0 28px;
+            overflow-x: auto;
+        }
+        .dash-tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dash-tab-btn:hover {
+            color: #fff;
+            background: rgba(56, 189, 248, 0.1);
+        }
+        .dash-tab-btn.active {
+            background: var(--blue);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+        }
+        .dash-tab-content {
+            display: none;
+        }
+        .dash-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* SECTION COLOR DIFFERENTIATION & WIDE SPACING */
+        .section-overview {
+            background: linear-gradient(135deg, rgba(14, 23, 48, 0.85) 0%, rgba(10, 16, 34, 0.95) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .section-vitals {
+            background: linear-gradient(135deg, rgba(18, 15, 42, 0.85) 0%, rgba(11, 10, 28, 0.95) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .section-hazards {
+            background: linear-gradient(135deg, rgba(20, 36, 32, 0.85) 0%, rgba(12, 22, 20, 0.95) 100%);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .section-alerts {
+            background: linear-gradient(135deg, rgba(42, 18, 22, 0.85) 0%, rgba(26, 10, 14, 0.95) 100%);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .split-grid-2 {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        .hazard-link-pill {
+            background: rgba(16, 26, 50, 0.75);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.2s ease;
+            text-decoration: none;
+        }
+        .hazard-link-pill:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        /* CARDS & METRICS */
+        .card{background:linear-gradient(145deg,#102238,#0b1929);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 8px 25px #0002;min-width:0}
+        .card h3{font-size:14px;margin:0 0 7px}
+        .muted{color:var(--muted)}
+        .small{font-size:11px;line-height:1.6}
+        .metric{position:relative;overflow:hidden}
+        .metric:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-35px;top:-40px;background:var(--glow,#45b9ff);opacity:.08}
+        .metric .name{font-size:11px;color:var(--muted);font-weight:700}
+        .metric .value{font-size:25px;font-weight:800;margin:13px 0 5px;letter-spacing:-1px}
+        .unit{font-size:11px;color:var(--muted);font-weight:500}
+        
+        .status{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:5px 8px;font-size:9px;font-weight:800;letter-spacing:.5px}
+        .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+        .safe{color:var(--green);background:#12372e}
+        .warning{color:var(--amber);background:#3b301c}
+        .critical{color:var(--red);background:#421f29}
+        .info{color:var(--blue);background:#14324a}
+
+        .overall-health-card{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px;background:linear-gradient(110deg,#103c4c,#102238 60%,#172447);border:1px solid #27617a;border-radius:16px;flex-wrap:wrap}
+        
+        .metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+        .metric-card{cursor:pointer;transition:.2s}
+        .metric-card:hover{transform:translateY(-2px);border-color:#4b8cb4}
+        .metric-card.selected{border-color:var(--purple);box-shadow:0 0 0 1px #b69aff44}
+
+        /* TABLES & FORMS */
+        .table-wrap{overflow:auto}
+        table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+        th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line)}
+        th{color:var(--muted);font-size:10px}
+        .empty{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+
+        .btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:#102238;color:var(--text);font-size:12px;font-weight:700}
+        .btn.primary{background:#147ab2;border-color:#299bd6}
+        .btn.danger{border-color:#8f3e4b;color:#ff9ba5;background:#341923}
+        .btn:hover{filter:brightness(1.15)}
+
+        .field label{display:block;font-size:10px;color:var(--muted);font-weight:700;margin-bottom:6px}
+        .field input,.field select,.field textarea{width:100%;background:#071523;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:11px;outline:none}
+        .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
+
+        /* MODAL */
+        .modal{display:none;position:fixed;inset:0;background:#000b;z-index:20;align-items:center;justify-content:center;padding:18px}
+        .modal.open{display:flex}
+        .modal-box{width:min(520px,100%);background:#0d1b2c;border:1px solid var(--line);border-radius:17px;padding:22px;box-shadow:var(--shadow)}
+        .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+        .close{background:transparent;border:0;color:white;font-size:22px}
+
+        .footer-note{color:#71869b;font-size:10px;line-height:1.6;margin:30px 0 10px;text-align:center}
+
+        @media(max-width:1100px){.metric-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:780px){.metric-grid{grid-template-columns:repeat(2,1fr)}.split-grid-2{grid-template-columns:1fr}.mission-status-bar{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <!-- TOP NAVIGATION -->
+        <header class="dashboard-nav">
+            <a href="index.html" class="logo" aria-label="AstroLife Home">
+                <span class="logo-icon">✦</span> ASTROLIFE
+            </a>
+
+            <div class="user-profile">
+                <div id="userAvatar" class="user-avatar">A</div>
+                <div>
+                    <div id="dashboardUserName" class="user-name-display">Dr. Alexander Cole</div>
+                    <div id="userRoleBadge" class="user-role-badge">
+                        <span class="status info" style="font-size:10px;">✦ ASTRONAUT CREW</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <span class="btn" id="missionClock">MISSION CLOCK --:--:--</span>
+                <button class="btn" id="audioEnable">🔊 Enable audio</button>
+                <button class="btn" id="muteBtn">Mute</button>
+                <a href="profile.html" class="back-home-link">Profile</a>
+                <button type="button" id="logoutBtn" class="btn-logout">Logout</button>
+            </div>
+        </header>
+
+        <!-- CRITICAL ALERT STRIP -->
+        <div class="alert-strip" id="criticalStrip">
+            <div>
+                <strong>🚨 ACTIVE CRITICAL TELEMETRY ALERT</strong>
+                <div class="small" id="criticalStripText">Immediate medical attention required.</div>
+            </div>
+            <button class="btn primary" onclick="switchTab('tab-alerts')">Inspect Alert</button>
+        </div>
+
+        <!-- MAIN DASHBOARD BODY -->
+        <main class="dashboard-body" style="margin-top: 20px;">
+
+            <!-- MISSION STATUS BAR -->
+            <section class="mission-status-bar" style="margin-bottom: 24px;">
+                <div class="mission-meta-group">
+                    <div class="meta-pill">
+                        <small>Active Mission</small>
+                        <strong id="missionNameDisplay">Artemis VII - Mars Transit Mission</strong>
+                    </div>
+                    <div class="meta-pill">
+                        <small>Mission Timeline</small>
+                        <strong style="color: var(--cyan);" id="missionDurationDisplay">Day 42 of 180 Days</strong>
+                    </div>
+                    <div class="meta-pill">
+                        <small>Current Sol</small>
+                        <strong id="missionSolDisplay" style="color: #4ade80;">SOL 42</strong>
+                    </div>
+                </div>
+
+                <!-- Daily Health Check-in Completion Progress -->
+                <div style="min-width: 220px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;">
+                        <span style="color: var(--muted); text-transform: uppercase; font-weight: 600;">Daily Health Check-in</span>
+                        <strong style="color: var(--cyan);" id="checkinCountDisplay">10/10 Completed (100%)</strong>
+                    </div>
+                    <div style="width: 100%; height: 7px; background: #071523; border-radius: 999px; overflow: hidden; border: 1px solid var(--line);">
+                        <div id="checkinProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan));"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION TAB NAVIGATION BAR -->
+            <div class="dash-nav-tabs" role="tablist">
+                <button type="button" class="dash-tab-btn active" data-tab="tab-overview">
+                    <span>⚡</span> Overview & Summary
+                </button>
+                <button type="button" class="dash-tab-btn" data-tab="tab-vitals">
+                    <span>📈</span> Vitals & Telemetry
+                </button>
+                <button type="button" class="dash-tab-btn" data-tab="tab-hazards">
+                    <span>🛡️</span> Space Hazards & Modules
+                </button>
+                <button type="button" class="dash-tab-btn" data-tab="tab-alerts">
+                    <span>⚠️</span> Alerts & AI Insights
+                </button>
+               <section 
+    class="dashboard-card" 
+    onclick="window.location.href='routine.html'" 
+    style="margin-top: 24px; padding: 24px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(53, 223, 255, 0.25); border-radius: 14px; backdrop-filter: blur(12px); cursor: pointer; transition: all 0.25s ease;"
+    onmouseover="this.style.borderColor='rgba(53, 223, 255, 0.7)'; this.style.transform='translateY(-2px)';"
+    onmouseout="this.style.borderColor='rgba(53, 223, 255, 0.25)'; this.style.transform='translateY(0)';"
+>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h2 style="margin: 0; font-size: 18px; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                <span>📅</span> Daily Mission Routine (UTC)
+                <span style="font-size: 12px; color: #35dfff; font-weight: 500; margin-left: 6px;">↗ Open</span>
+            </h2>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #94a3b8;">Click to view yesterday's health summary & today's UTC schedule.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="routineProgressText" style="font-size: 13px; font-weight: 600; color: #35dfff;">0 / 9 Completed</span>
+            <div style="width: 100px; height: 8px; background: rgba(148, 163, 184, 0.2); border-radius: 4px; overflow: hidden;">
+                <div id="routineProgressBar" style="width: 0%; height: 100%; background: #35dfff; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Syncs the dashboard card's progress bar with tasks checked off in routine.html
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTasks = JSON.parse(localStorage.getItem("astronautRoutineTasks")) || [];
+        const totalTasks = 9;
+        const completedCount = savedTasks.filter(Boolean).length;
+        const percentage = Math.round((completedCount / totalTasks) * 100);
+
+        document.getElementById("routineProgressText").textContent = `${completedCount} / ${totalTasks} Completed`;
+        document.getElementById("routineProgressBar").style.width = `${percentage}%`;
+    });
+</script>
+            </div>
+
+            <!-- ================= TAB 1: OVERVIEW ================= -->
+            <div id="tab-overview" class="dash-tab-content active">
+                <div class="section-overview">
+                    <div style="max-width: 1100px; margin: 0 auto;">
+                        <h2 style="font-size: 24px; color: #fff; font-weight: 700; margin-bottom: 8px;">Mission Command Overview</h2>
+                        <p style="font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 24px;">
+                            Real-time aerospace bio-telemetry aggregation, mission clock telemetry streams, and clinical protocol schedules.
+                        </p>
+
+                        <!-- OVERALL HEALTH STATUS BANNER -->
+                        <section class="overall-health-card" style="margin-bottom: 28px;">
+                            <div>
+                                <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                                    Aggregate Bio-Telemetry Status
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+                                    <span class="status safe" id="overallBadge" style="font-size: 11px; padding: 6px 12px;"><i class="dot"></i>NOMINAL</span>
+                                </div>
+                                <h2 id="overallTitle" style="font-size: 19px; margin: 0 0 6px 0; color: #fff;">All monitored indicators are nominal</h2>
+                                <p id="overallSummary" style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">
+                                    Continue scheduled health checks and monitor physiological baseline shifts.
+                                </p>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px; min-width: 200px;">
+                                <button type="button" id="startStream" class="btn primary" style="padding: 12px 18px;">▶ Start Telemetry Stream</button>
+                                <button type="button" id="stopStream" class="btn" style="padding: 10px 18px;">Ⅱ Pause Stream</button>
+                                <button type="button" id="manualOpen" class="btn" style="padding: 10px 18px; border-color: var(--blue); color: var(--blue);">＋ Log Measurement</button>
+                            </div>
+                        </section>
+
+                        <!-- CURRENT SNAPSHOT METRICS GRID -->
+                        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; margin:23px 0 12px;">
+                            <h2 style="font-size:16px; margin:0;">Current Health Snapshot</h2>
+                            <span class="muted" style="font-size:11px;">Last Telemetry Update: <strong id="lastUpdate" style="color:var(--text)">--:--:--</strong></span>
+                        </div>
+                        <div class="metric-grid" id="overviewMetrics" style="margin-bottom: 28px;"></div>
+
+                        <!-- TWO-COLUMN ADDITIONAL PANELS -->
+                        <div class="split-grid-2" style="margin-bottom: 0;">
+                            <div class="card" style="background: rgba(11, 19, 36, 0.8);">
+                                <h3>Mission System Status</h3>
+                                <p class="small muted" style="margin-bottom: 16px;">Active environmental and physiological telemetry control modules.</p>
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px;">
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(16, 26, 50, 0.5); border-radius: 8px;">
+                                        <span class="muted">Cardiovascular Monitor:</span>
+                                        <strong style="color: var(--green);">Active / Nominal</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(16, 26, 50, 0.5); border-radius: 8px;">
+                                        <span class="muted">Radiation Dosimeter Link:</span>
+                                        <strong style="color: var(--cyan);">Synchronized</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(16, 26, 50, 0.5); border-radius: 8px;">
+                                        <span class="muted">Cabin Life Support (ECLSS):</span>
+                                        <strong style="color: var(--green);">Optimal</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card" style="background: rgba(11, 19, 36, 0.8);">
+                                <h3>Upcoming Medical Protocols</h3>
+                                <p class="small muted" style="margin-bottom: 16px;">Scheduled clinical evaluations on the Artemis manifest.</p>
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px;">
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(16, 26, 50, 0.5); border-radius: 8px;">
+                                        <div>
+                                            <strong style="color: #fff; display: block;">Cardiovascular Stress Protocol</strong>
+                                            <span class="muted" style="font-size: 11px;">45-min VO2 sub-maximal check</span>
+                                        </div>
+                                        <span style="color: var(--cyan); font-weight: 700;">Sol 42</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(16, 26, 50, 0.5); border-radius: 8px;">
+                                        <div>
+                                            <strong style="color: #fff; display: block;">Retinal OCT Screening</strong>
+                                            <span class="muted" style="font-size: 11px;">SANS optic disc swelling check</span>
+                                        </div>
+                                        <span style="color: var(--cyan); font-weight: 700;">Sol 43</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 2: VITALS & TELEMETRY ================= -->
+            <div id="tab-vitals" class="dash-tab-content">
+                <div class="section-vitals">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h2 style="font-size: 20px; color: #ffffff; font-weight: 700; margin: 0;">
+                                Physiological Indicators & Telemetry <span style="font-size: 13px; color: #a855f7; font-weight: normal;">(10 Parameters)</span>
+                            </h2>
+                            <p style="font-size: 13px; color: var(--muted); margin: 4px 0 0 0;">Select any parameter card to inspect trend analysis and microgravity measurement history.</p>
+                        </div>
+                        <button class="btn primary" id="manualOpen2">＋ Add Measurement</button>
+                    </div>
+
+                    <!-- 10 PARAMETER CARDS -->
+                    <div class="metric-grid" id="vitalsMetrics" style="margin-bottom: 28px;"></div>
+
+                    <!-- TREND GRAPH & HISTORY -->
+                    <div class="split-grid-2" style="margin-bottom: 0;">
+                        <div class="card" style="background: rgba(11, 10, 28, 0.9);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <h3 id="chartTitle" style="margin: 0; font-size: 16px;">Heart rate trend</h3>
+                                <span class="small muted">Real-time Telemetry Stream</span>
+                            </div>
+                            <canvas id="vitalsChart" height="150"></canvas>
+                        </div>
+
+                        <div class="card" style="background: rgba(11, 10, 28, 0.9);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <h3 style="margin: 0; font-size: 16px;">Measurement History</h3>
+                                <button class="btn" id="exportCsv" style="font-size: 11px; padding: 6px 10px;">↓ Export CSV</button>
+                            </div>
+                            <div class="table-wrap" style="max-height: 250px;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>TIME</th>
+                                            <th>PARAMETER</th>
+                                            <th>VALUE</th>
+                                            <th>SOURCE</th>
+                                            <th>STATUS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyBody">
+                                        <tr><td colspan="5" class="empty">No telemetry readings recorded yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 3: SPACE HAZARDS & MODULES ================= -->
+            <div id="tab-hazards" class="dash-tab-content">
+                <div class="section-hazards">
+                    <h2 style="font-size: 20px; color: #fff; font-weight: 700; margin-bottom: 8px;">Aerospace Space Hazard Monitoring Modules</h2>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px;">
+                        Access specialized telemetry monitoring centers dedicated to deep space environmental hazards and physiological risk domains.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
+                        <a href="radiation.html" class="hazard-link-pill">
+                            <div>
+                                <strong style="color: #fff; font-size: 15px; display: block; margin-bottom: 4px;">☼ Space Radiation</strong>
+                                <span class="small muted">Track radiation dose & cumulative exposure</span>
+                            </div>
+                            <span style="color: #4ade80; font-size: 18px;">→</span>
+                        </a>
+                        <a href="mental-wellness.html" class="hazard-link-pill">
+                            <div>
+                                <strong style="color: #fff; font-size: 15px; display: block; margin-bottom: 4px;">☾ Isolation & Confinement</strong>
+                                <span class="small muted">Record mood, stress & sleep quality</span>
+                            </div>
+                            <span style="color: #4ade80; font-size: 18px;">→</span>
+                        </a>
+                        <a href="distance-support.html" class="hazard-link-pill">
+                            <div>
+                                <strong style="color: #fff; font-size: 15px; display: block; margin-bottom: 4px;">⌁ Distance from Earth</strong>
+                                <span class="small muted">Display comms delay & offline protocols</span>
+                            </div>
+                            <span style="color: #4ade80; font-size: 18px;">→</span>
+                        </a>
+                        <a href="gravity-health.html" class="hazard-link-pill">
+                            <div>
+                                <strong style="color: #fff; font-size: 15px; display: block; margin-bottom: 4px;">◉ Gravity & Microgravity</strong>
+                                <span class="small muted">Monitor cardiovascular & bone health</span>
+                            </div>
+                            <span style="color: #4ade80; font-size: 18px;">→</span>
+                        </a>
+                        <a href="hostile-environment.html" class="hazard-link-pill">
+                            <div>
+                                <strong style="color: #fff; font-size: 15px; display: block; margin-bottom: 4px;">⌂ Closed Environment</strong>
+                                <span class="small muted">Monitor oxygen, CO₂, temperature & humidity</span>
+                            </div>
+                            <span style="color: #4ade80; font-size: 18px;">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 4: ALERTS & AI INSIGHTS ================= -->
+            <div id="tab-alerts" class="dash-tab-content">
+                <div class="section-alerts">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h2 style="font-size: 20px; color: #fff; font-weight: 700; margin-bottom: 4px;">Medical Alerts & AI Clinical Insights</h2>
+                            <p style="font-size: 13px; color: var(--muted); margin: 0;">Detailed diagnostics, triggering measurements, and CDSS engine recommendations.</p>
+                        </div>
+                        <button class="btn" id="testAlarm" style="border-color: var(--red); color: var(--red);">🔔 Test Sound Alarm</button>
+                    </div>
+
+                    <!-- SUMMARY COUNTS -->
+                    <div class="grid three" style="grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px;">
+                        <div class="card" style="background: rgba(26, 10, 14, 0.8);">
+                            <div class="small muted">CRITICAL ALERTS</div>
+                            <div class="value" id="criticalCount" style="color:var(--red); font-size:24px; font-weight:800; margin-top:6px;">0</div>
+                        </div>
+                        <div class="card" style="background: rgba(34, 28, 16, 0.8);">
+                            <div class="small muted">WARNING ALERTS</div>
+                            <div class="value" id="warningCount" style="color:var(--amber); font-size:24px; font-weight:800; margin-top:6px;">0</div>
+                        </div>
+                        <div class="card" style="background: rgba(14, 28, 43, 0.8);">
+                            <div class="small muted">INFORMATION</div>
+                            <div class="value" id="infoCount" style="color:var(--blue); font-size:24px; font-weight:800; margin-top:6px;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVE ALERTS AND INSIGHTS -->
+                    <div class="split-grid-2" style="margin-bottom: 0;">
+                        <div class="card" style="background: rgba(26, 10, 14, 0.9);">
+                            <h3 style="margin-bottom: 12px;">Active Alert Queue</h3>
+                            <div id="alertsList">
+                                <div class="card empty">No active alerts. Continue routine monitoring.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="background: rgba(26, 10, 14, 0.9);">
+                            <h3 style="margin-bottom: 12px;">AI Health Insights</h3>
+                            <p class="small muted" id="insightSummary" style="line-height: 1.6; margin-bottom: 16px;">
+                                No unusual trend has been detected in current telemetry samples.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;" class="muted">
+                                <div>• <strong>Sensor Calibration:</strong> All biometrics transmitting valid telemetry packets.</div>
+                                <div>• <strong>Clinical Oversight:</strong> CDSS provides decision support; medical officer verification required.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <p class="footer-note">AstroLife Astronaut Health Command • Aerospace Telemetry System • All Rights Reserved</p>
+    </div>
+
+    <!-- MODAL: MANUAL MEASUREMENT ENTRY -->
+    <div class="modal" id="measurementModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3 id="modalTitle" style="margin: 0; color: #fff; font-size: 18px;">Log Telemetry Measurement</h3>
+                <button class="close" id="modalClose" aria-label="Close">×</button>
+            </div>
+            <form id="measurementForm">
+                <div class="field" style="margin-bottom:12px">
+                    <label for="metricSelect">HEALTH PARAMETER</label>
+                    <select id="metricSelect"></select>
+                </div>
+                <div class="field" style="margin-bottom:12px">
+                    <label for="metricValue">MEASUREMENT VALUE</label>
+                    <input id="metricValue" type="number" step="any" required placeholder="Enter measured value">
+                </div>
+                <div class="field" style="margin-bottom:18px">
+                    <label for="metricNote">CLINICAL NOTES / CONTEXT (OPTIONAL)</label>
+                    <input id="metricNote" type="text" placeholder="e.g., Post-ARED resistive workout session">
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:8px">
+                    <button type="button" class="btn" id="cancelModal">Cancel</button>
+                    <button class="btn primary" type="submit">Save Measurement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script> window.chtlConfig = { chatbotId: "9633574682" } </script>
+<script async data-id="9633574682" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+    <!-- INTEGRATED DASHBOARD & TELEMETRY SCRIPT -->
+    <script>
+    (() => {
+    "use strict";
+    const metrics = {
+        heartRate:{label:"Heart rate",unit:"bpm",value:72,min:50,max:100,criticalLow:40,criticalHigh:130,color:"#45b9ff",step:1},
+        spo2:{label:"Blood oxygen (SpO₂)",unit:"%",value:98,min:95,max:100,criticalLow:90,criticalHigh:100,color:"#4cdda0",step:1},
+        systolic:{label:"Systolic blood pressure",unit:"mmHg",value:118,min:90,max:140,criticalLow:80,criticalHigh:180,color:"#b69aff",step:1},
+        temperature:{label:"Body temperature",unit:"°C",value:36.8,min:36,max:37.5,criticalLow:35,criticalHigh:39,color:"#ffc45c",step:.1},
+        respiration:{label:"Respiratory rate",unit:"breaths/min",value:16,min:12,max:20,criticalLow:8,criticalHigh:30,color:"#ff8d9a",step:1},
+        glucose:{label:"Blood glucose",unit:"mg/dL",value:95,min:70,max:140,criticalLow:54,criticalHigh:250,color:"#69c8ff",step:1},
+        sleep:{label:"Sleep duration",unit:"hours",value:7.5,min:7,max:9,criticalLow:0,criticalHigh:18,color:"#c5a3ff",step:.1},
+        activity:{label:"Physical activity",unit:"min",value:45,min:20,max:120,criticalLow:0,criticalHigh:300,color:"#64d9bb",step:1},
+        stress:{label:"Stress level",unit:"/10",value:3,min:1,max:5,criticalLow:0,criticalHigh:9,color:"#ffbd70",step:1},
+        hydration:{label:"Hydration intake",unit:"L",value:2.2,min:1.8,max:3.5,criticalLow:0,criticalHigh:6,color:"#65baff",step:.1}
+    };
+    
+    let values = Object.fromEntries(Object.entries(metrics).map(([k,v])=>[k,v.value]));
+    let activeAlerts=[], history=[], streamTimer=null, audioContext=null, audioEnabled=false, muted=false, chart=null, selectedMetric="heartRate";
+    
+    const $=id=>document.getElementById(id);
+    const now=()=>new Date().toLocaleTimeString();
+    
+    function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2800)}
+    function statusFor(key,value){const m=metrics[key];if(value<=m.criticalLow||value>=m.criticalHigh)return "CRITICAL";if(value<m.min||value>m.max)return "WARNING";return "NORMAL"}
+    function badgeClass(s){return s==="CRITICAL"?"critical":s==="WARNING"?"warning":"safe"}
+    
+    function addHistory(key,value,source="TELEMETRY"){
+        const s=statusFor(key,value);
+        history.unshift({time:new Date().toLocaleTimeString(),key,value,source,status:s});
+        renderHistory();
+    }
+    
+    function enableAudio(){
+        try{
+            const Ctx=window.AudioContext||window.webkitAudioContext;
+            if(!Ctx){toast("Audio is not supported in this browser.");return}
+            audioContext=audioContext||new Ctx();
+            audioContext.resume();
+            audioEnabled=true;
+            $("audioEnable").textContent="🔊 Audio enabled";
+            toast("Alert audio enabled.");
+        }catch(e){toast("Could not enable audio in this browser.")}
+    }
+    
+    function tone(freq,duration,when=0,volume=.12){
+        if(!audioEnabled||muted||!audioContext)return;
+        const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+        osc.type="sine";osc.frequency.value=freq;
+        gain.gain.setValueAtTime(.001,audioContext.currentTime+when);
+        gain.gain.exponentialRampToValueAtTime(volume,audioContext.currentTime+when+.02);
+        gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+when+duration);
+        osc.connect(gain);gain.connect(audioContext.destination);
+        osc.start(audioContext.currentTime+when);osc.stop(audioContext.currentTime+when+duration+.03);
+    }
+    
+    function playSound(level){
+        if(!audioEnabled||muted)return;
+        if(level==="CRITICAL"){tone(880,.24,0,.18);tone(660,.24,.32,.18);tone(880,.24,.64,.18)}
+        else if(level==="WARNING"){tone(620,.18,0,.1);tone(620,.18,.32,.1)}
+        else tone(520,.12,0,.07);
+    }
+    
+    function createAlert(level,title,message,action,key=null){
+        if(key&&activeAlerts.some(a=>a.key===key&&!a.acknowledged&&a.level===level))return;
+        const a={id:Date.now()+Math.random(),level,title,message,action,key,time:new Date().toLocaleTimeString(),acknowledged:false};
+        activeAlerts.unshift(a);
+        playSound(level);
+        renderAlerts();
+        updateOverview();
+        if(level==="CRITICAL")$("criticalStripText").textContent=title+": "+message;
+        toast(level+" alert: "+title);
+    }
+    
+    function acknowledge(id){
+        const a=activeAlerts.find(x=>x.id===id);
+        if(a){a.acknowledged=true;renderAlerts();updateOverview();toast("Alert acknowledged.")}
+    }
+    
+    function evaluate(key,value,source){
+        const m=metrics[key],s=statusFor(key,value);
+        if(s==="CRITICAL")createAlert("CRITICAL",m.label+" outside critical limit",`Recorded ${value} ${m.unit}. Review sensor and follow mission medical protocols.`,`Contact designated flight surgeon channel.`,key);
+        else if(s==="WARNING")createAlert("WARNING",m.label+" outside nominal range",`Recorded ${value} ${m.unit}. Recheck measurement and review astronaut symptoms.`,`Repeat measurement per medical checklist.`,key);
+    }
+    
+    function renderMetricCard(key){
+        const m=metrics[key],v=values[key],s=statusFor(key,v);
+        return `<div class="card metric metric-card ${selectedMetric===key?"selected":""}" data-metric="${key}" style="--glow:${m.color}">
+            <div class="name">${m.label}</div>
+            <div class="value">${v}<span class="unit"> ${m.unit}</span></div>
+            <span class="status ${badgeClass(s)}"><i class="dot"></i>${s}</span>
+            <div class="small muted" style="margin-top:9px">Click to view trend</div>
+        </div>`;
+    }
+    
+    function renderMetrics(){
+        $("overviewMetrics").innerHTML=["heartRate","spo2","systolic","temperature","respiration"].map(renderMetricCard).join("");
+        $("vitalsMetrics").innerHTML=Object.keys(metrics).map(renderMetricCard).join("");
+        document.querySelectorAll("[data-metric]").forEach(el=>el.addEventListener("click",()=>selectMetric(el.dataset.metric)));
+    }
+    
+    function selectMetric(key){
+        selectedMetric=key;
+        $("chartTitle").textContent=metrics[key].label+" trend";
+        renderMetrics();
+        renderChart();
+    }
+    
+    function renderChart(){
+        const ctx=$("vitalsChart");
+        if(!ctx||!window.Chart)return;
+        const points=history.filter(h=>h.key===selectedMetric).slice(0,12).reverse();
+        const labels=points.length?points.map((p,i)=>"T-"+(points.length-i)):["Baseline"];
+        const data=points.length?points.map(p=>p.value):[values[selectedMetric]];
+        if(chart)chart.destroy();
+        chart=new Chart(ctx,{
+            type:"line",
+            data:{labels,datasets:[{label:metrics[selectedMetric].label+" ("+metrics[selectedMetric].unit+")",data,borderColor:metrics[selectedMetric].color,backgroundColor:metrics[selectedMetric].color+"22",fill:true,tension:.35,pointRadius:3}]},
+            options:{responsive:true,plugins:{legend:{labels:{color:"#c5d5e5"}}},scales:{x:{ticks:{color:"#8fa6bb"},grid:{color:"#20364d"}},y:{ticks:{color:"#8fa6bb"},grid:{color:"#20364d"}}}}
+        });
+    }
+    
+    function renderAlerts(){
+        const active=activeAlerts.filter(a=>!a.acknowledged);
+        $("criticalCount").textContent=active.filter(a=>a.level==="CRITICAL").length;
+        $("warningCount").textContent=active.filter(a=>a.level==="WARNING").length;
+        $("infoCount").textContent=active.filter(a=>a.level==="INFO").length;
+        $("criticalStrip").classList.toggle("show",active.some(a=>a.level==="CRITICAL"));
+        $("alertsList").innerHTML=active.length?active.map(a=>`
+            <div class="card" style="margin-bottom:10px;border-left:4px solid var(--${a.level==="CRITICAL"?"red":a.level==="WARNING"?"amber":"blue"})">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span class="status ${badgeClass(a.level)}">${a.level}</span>
+                    <span class="small muted">${a.time}</span>
+                </div>
+                <h4 style="margin:8px 0 4px;color:#fff">${a.title}</h4>
+                <p class="small muted">${a.message}</p>
+                <p class="small" style="margin-top:6px"><strong>Action:</strong> ${a.action}</p>
+                <button class="btn" style="margin-top:10px;font-size:11px;" onclick="window.astroAck('${a.id}')">Acknowledge</button>
+            </div>`).join(""):'<div class="card empty">No active alerts. Continue routine monitoring.</div>';
+    }
+    
+    function renderHistory(){
+        $("historyBody").innerHTML=history.length?history.map(h=>`
+            <tr>
+                <td>${h.time}</td>
+                <td>${metrics[h.key].label}</td>
+                <td>${h.value} ${metrics[h.key].unit}</td>
+                <td>${h.source}</td>
+                <td><span class="status ${badgeClass(h.status)}">${h.status}</span></td>
+            </tr>`).join(""):'<tr><td colspan="5" class="empty">No telemetry readings recorded yet.</td></tr>';
+    }
+    
+    function updateOverview(){
+        const active=activeAlerts.filter(a=>!a.acknowledged),critical=active.some(a=>a.level==="CRITICAL"),warning=active.some(a=>a.level==="WARNING");
+        const s=critical?"CRITICAL":warning?"CAUTION":"NOMINAL";
+        $("overallBadge").className="status "+(critical?"critical":warning?"warning":"safe");
+        $("overallBadge").innerHTML='<i class="dot"></i>'+s;
+        $("overallTitle").textContent=critical?"Critical telemetry anomaly requires attention":warning?"One or more parameters need review":"All monitored indicators are nominal";
+        $("overallSummary").textContent=critical?"Review active critical alerts and follow emergency protocols.":warning?"Review parameter warnings and repeat measurement.":"Continue scheduled health checks and monitor telemetry baseline.";
+        renderAlerts();
+    }
+    
+    function setValue(key,value,source="MANUAL"){
+        values[key]=value;
+        addHistory(key,value,source);
+        evaluate(key,value,source);
+        renderMetrics();
+        renderChart();
+        updateOverview();
+        $("lastUpdate").textContent=now();
+    }
+    
+    window.switchTab = function(tabId){
+        document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
+        document.querySelectorAll('.dash-tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+    };
+
+    function init(){
+        const savedUser = JSON.parse(localStorage.getItem('astrolife_current_user') || 'null');
+        if(savedUser && savedUser.fullName) {
+            $("dashboardUserName").textContent = savedUser.fullName;
+            $("userAvatar").textContent = savedUser.fullName.charAt(0);
+        }
+        
+        const select = $("metricSelect");
+        select.innerHTML = Object.entries(metrics).map(([k,v])=>`<option value="${k}">${v.label} (${v.unit})</option>`).join("");
+        
+        // Tab listeners
+        document.querySelectorAll('.dash-tab-btn').forEach(btn=>{
+            btn.addEventListener("click", ()=>switchTab(btn.dataset.tab));
+        });
+
+        $("audioEnable").addEventListener("click", enableAudio);
+        $("muteBtn").addEventListener("click", ()=>{muted=!muted;$("muteBtn").textContent=muted?"Unmute":"Mute";toast(muted?"Audio muted":"Audio unmuted")});
+
+        const openModal=()=>{$("measurementModal").classList.add("open");$("metricValue").value=values[selectedMetric];$("metricSelect").value=selectedMetric};
+        const closeModal=()=>$("measurementModal").classList.remove("open");
+        $("manualOpen").addEventListener("click", openModal);
+        $("manualOpen2").addEventListener("click", openModal);
+        $("modalClose").addEventListener("click", closeModal);
+        $("cancelModal").addEventListener("click", closeModal);
+
+        $("measurementForm").addEventListener("submit", e=>{
+            e.preventDefault();
+            const key=$("metricSelect").value, val=parseFloat($("metricValue").value);
+            if(!isNaN(val)){
+                setValue(key,val,"MANUAL");
+                closeModal();
+                toast("Measurement successfully logged.");
+            }
+        });
+
+        $("startStream").addEventListener("click", startStream);
+        $("stopStream").addEventListener("click", stopStream);
+        $("testAlarm").addEventListener("click", ()=>playSound("CRITICAL"));
+        
+        $("exportCsv").addEventListener("click", ()=>{
+            if(!history.length){toast("No history records to export.");return;}
+            let csv="Time,Parameter,Value,Source,Status\n"+history.map(h=>`"${h.time}","${metrics[h.key].label}",${h.value},"${h.source}","${h.status}"`).join("\n");
+            const blob=new Blob([csv],{type:"text/csv"});
+            const url=URL.createObjectURL(blob);
+            const a=document.createElement("a");
+            a.href=url;a.download="astrolife_telemetry_history.csv";
+            a.click();
+            toast("Telemetry CSV exported.");
+        });
+
+        // Mission clock ticker
+        setInterval(()=>{
+            const d=new Date();
+            $("missionClock5") // handled below
+            $("missionClock").textContent="UTC "+d.getUTCHours().toString().padStart(2,'0')+":"+d.getUTCMinutes().toString().padStart(2,'0')+":"+d.getUTCSeconds().toString().padStart(2,'0');
+        },1000);
+
+        renderMetrics();
+        renderChart();
+        updateOverview();
+    }
+
+    function startStream(){
+        if(streamTimer) { toast("Telemetry stream already active."); return; }
+        streamTimer=setInterval(()=>{
+            const keys=Object.keys(metrics);
+            const k=keys[Math.floor(Math.random()*keys.length)];
+            const m=metrics[k];
+            const delta=(Math.random()-.48)*(m.max-m.min)*0.08;
+            let newVal=Math.round((values[k]+delta)*10)/10;
+            if(newVal<m.min) newVal=m.min;
+            if(newVal>m.max) newVal=m.max;
+            setValue(k,newVal,"TELEMETRY");
+        },5000);
+        toast("Real-time telemetry stream connected.");
+    }
+
+    function stopStream(){
+        if(streamTimer){clearInterval(streamTimer);streamTimer=null;toast("Telemetry stream paused.");}
+    }
+
+    window.astroAck = acknowledge;
+    window.addEventListener("DOMContentLoaded", init);
+    })();
+    </script>
+</body>
+</html>
